@@ -1,5 +1,29 @@
 {% extends "projects/main.html" %}
 {% block content %}
-<h1>Projects Templates<h1/>
-{% endblock content %}
 
+{% for project in projects %}
+<table>
+    <tr>
+        <th>Title</th>
+        <td><a href="{% url 'project_detail' project.pk %}">{{ project.title }}</a></td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{ project.description }}</td>
+    </tr>
+    <tr>
+        <th>Vote count</th>
+        <td>{{ project.vote_count }}</td>
+    </tr>
+    <tr>
+        <th>Ratio</th>
+        <td>{{ project.vote_ratio }}</td>
+    </tr>
+    <tr>
+        <th>Created</th>
+        <td>{{ project.created_at}}</td>
+    </tr>
+{% endfor %}
+
+
+{% endblock %}
