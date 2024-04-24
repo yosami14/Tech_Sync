@@ -5,6 +5,7 @@ class Project(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False, )
     title = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True, default='default.jpg', upload_to='project_images/')
     demo_link = models.URLField(null=True, blank=True)
     source_link = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -13,7 +14,6 @@ class Project(models.Model):
     vote_ratio = models.IntegerField(default=0, null=True, blank=True)
     # updated_at = models.DateTimeField(auto_now=True)
     # is_active = models.BooleanField(default=True)
-    # image = models.ImageField(upload_to='project_images/')
     
     def __str__(self):
         return self.title
