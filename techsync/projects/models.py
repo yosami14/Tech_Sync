@@ -9,8 +9,8 @@ import os
 #     return f"project_images/{instance.title}_{instance.user.username}{file_extension}"
 
 class Project(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False, )
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
+    owner = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(null=True, blank=True, default='default.jpg', upload_to= 'project_image')
