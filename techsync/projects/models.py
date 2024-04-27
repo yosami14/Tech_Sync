@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from users.models import User,Profile
 import uuid
 import os
 # Create your models here.
@@ -9,7 +10,7 @@ import os
 
 class Project(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False, )
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(null=True, blank=True, default='default.jpg', upload_to= 'project_image')
