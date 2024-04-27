@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    #Apps
     'projects',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Defined the custom user(Abstract user) at userapp -> models
+AUTH_USER_MODEL = 'users.User'
+AUTHENTICATION_BACKEND = ['users.backends.EmailBackends']
