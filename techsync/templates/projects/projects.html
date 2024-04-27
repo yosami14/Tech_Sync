@@ -57,7 +57,7 @@
                   <div class="project__tags">
                     {% for tag in project.tags.all %}
                         <span class="tag tag--pill tag--main">
-                            <small>{{ tag }}</small>
+                            <small>{{ tag.name }}</small>
                         </span>
                     {% endfor %}
 

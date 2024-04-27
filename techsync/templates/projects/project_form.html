@@ -1,9 +1,57 @@
 {% extends "main/main.html" %}
 {% block content %}
-<h1>Project Form</h1>
-<form method='POST' enctype = 'multipart/form-data'>
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type='submit'>
-</form>
+    <!-- Main Section -->
+    <main class="formPage my-xl">
+        <div class="content-box">
+            <div class="formWrapper">
+                <a class="backButton" href="#"><i class="im im-angle-left"></i></a>
+                <br>
+
+                <form class="form" method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form__field">
+                            <label for="formInput#text">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+                </form>
+            </div>
+        </div>
+    </main>
+    
+
+    <script>
+        $(document).ready(function() {
+            $('.selectize-tags').selectize({
+                plugins: ['remove_button'],
+                delimiter: ',',
+                persist: false,
+                create: function(input) {
+                    return {
+                        value: input,
+                        text: input
+                    }
+                },
+                load: function(query, callback) {
+                    if (!query.length) return callback();
+                    $.ajax({
+                        url: '/get_tags/', // URL to fetch tags dynamically
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            q: query
+                        },
+                        error: function() {
+                            callback();
+                        },
+                        success: function(res) {
+                            callback(res);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock content %}

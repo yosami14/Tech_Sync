@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .models import Project
 from .forms import ProjectForm
 
+
 # Create your views here.
 def projects(request):
     projects = Project.objects.all()
@@ -59,3 +60,13 @@ def deleteProject(request, pk):
         'project': project,
     }
     return render (request, 'projects/delete_template.html', context)
+
+
+from django.http import JsonResponse
+from .models import Tag
+
+def get_tags(request):
+    term = request.GET.get('q', '')
+    tags = Tag.objects.filter(name__icontains=term)
+    results = [{'value': tag.name, 'text': tag.name} for tag in tags]
+    return JsonResponse(results, safe=False)
