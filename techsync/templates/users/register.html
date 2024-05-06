@@ -1,4 +1,41 @@
 {% extends "main/main.html" %}
 {% block content %}
-    
+<div class="auth">
+    <div class="card">
+      <div class="auth__header text-center">
+        <a href="/">
+          <img src="" alt="icon" />
+        </a>
+        <h3>Account SignUp</h3>
+        <p>Create a new developer account</p>
+      </div>
+
+      <form action="{% url 'register'%}" method="POST" class="form auth__form">
+        {% csrf_token %}
+        <!-- Register Form -->
+        {% for field in form %}
+            <div class="form__field">
+                <label for="formInput#{{ field.name }}">{{ field.label }}: </label>
+                {{ field }}
+
+            </div>                
+            {% if field.errors %}
+                
+                    {% for error in field.errors %}
+                        <p style=' color:red;'> {{ error }}</p>
+                    {% endfor %}
+                
+            {% endif %}
+        {% endfor %}
+
+        <div class="auth__actions">
+          <input class="btn btn--sub btn--lg" type="submit" value="Sign  In" />
+        </div>
+      </form>
+      <div class="auth__alternative">
+        <p>Already have an Account?</p>
+        <a href="{% url 'login' %}">Log In</a>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
