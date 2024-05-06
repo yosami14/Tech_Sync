@@ -9,21 +9,26 @@ from django.contrib import messages
 
 
 #Authentication
+
 def loginUser(request):
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        user = authenticate(request, username=email, password=password)
-        if user is not None and user.is_active:
-            login(request, user)
-            messages.success(request, 'You have been successfully logged in.')
-            return redirect('profiles')
+        # Check if email and password are provided
+        if email and password:
+            user = authenticate(request, email=email, password=password)
+            if user is not None and user.is_active:
+                login(request, user)
+                messages.success(request, 'You have been successfully logged in.')
+                return redirect('profiles')  # Adjust the redirect URL as needed
+            else:
+                messages.error(request, 'Invalid email or password.')
         else:
-            messages.error(request, 'Invalid email or password.')
-            return redirect('login')
-    else:
-        return render(request, 'users/login.html')
+            messages.error(request, 'Please provide both email and password.')
+    
+    # If not a POST request or if authentication failed, render the login page
+    return render(request, 'users/login.html')
 
 def logoutUser(request):
     logout(request)

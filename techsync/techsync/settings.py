@@ -142,4 +142,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #Defined the custom user(Abstract user) at userapp -> models
 AUTH_USER_MODEL = 'users.User'
-AUTHENTICATION_BACKEND = ['users.backends.EmailBackends']
+AUTHENTICATION_BACKENDS = ['users.backends.EmailAuthBackend']
