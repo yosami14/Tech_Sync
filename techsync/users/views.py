@@ -1,32 +1,60 @@
+from .models import *
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import *
+from django.contrib.auth.forms import UserCreationForm
+from .forms import UserForm
 from django.contrib import messages
+
 
 #Authentication
 def loginUser(request):
-    if request.user.is_authenticated:
-        return redirect('profiles')
-    
-    if request.method == 'POST':
-        username = request.POST.get('username')
+    if request.method == "POST":
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        
+        user = authenticate(request, username=email, password=password)
+        if user is not None and user.is_active:
             login(request, user)
             messages.success(request, 'You have been successfully logged in.')
             return redirect('profiles')
         else:
-            messages.error(request, 'Invalid username or password.')
-    
-    return render(request, 'users/login.html')
+            messages.error(request, 'Invalid email or password.')
+            return redirect('login')
+    else:
+        return render(request, 'users/login.html')
 
 def logoutUser(request):
     logout(request)
     messages.info(request, 'You have been successfully logged out.')
     return redirect('login')
+
+# User Creation
+def registerUser(request):
+    if request.user.is_authenticated:
+        return redirect('profiles')
+    
+    form = UserForm()
+
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+
+            messages.success(request, 'User account was created!')
+
+            login(request, user)
+            return redirect('Profiles')
+
+        else:
+            messages.error(request, 'An error has occurred during registration')
+
+    context = {'form': form}
+    return render(request, 'users/register.html', context)
+
 
 def Profiles(request):
     profiles = Profile.objects.all()
