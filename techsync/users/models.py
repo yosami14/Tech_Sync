@@ -20,7 +20,7 @@ class Profile(models.Model):
     github_link = models.CharField(max_length=200, blank=True,null=True)
     twitter_link = models.CharField(max_length=200, blank=True,null=True)
     linkedin_link = models.CharField(max_length=200, blank=True,null=True)
-    youtube_link = models.CharField(max_length=200, blank=True,null=True)
+    personal_link = models.CharField(max_length=200, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # or add feature that lets user create there own link
 
