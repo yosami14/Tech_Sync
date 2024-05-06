@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #Apps
+    #if u Encounter a error for signals or app 
+    #'users.apps.UsersConfig',
     'projects',
     'users',
 ]

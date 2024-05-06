@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid
+
+
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_recruiter = models.BooleanField(default=False)
@@ -36,3 +39,12 @@ class Skill(models.Model):
     
     def __str__(self):
         return str(self.name)
+    
+
+# def profileUpdated(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
+#     instance.profile.save()
+
+
+
