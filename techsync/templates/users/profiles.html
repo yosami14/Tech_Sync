@@ -23,14 +23,14 @@
         </div>
       </div>
     </section>
-    <!-- Search Result: DevList -->
+    <!-- Search Result: Techsync -->
     <section class="devlist">
       <div class="container">
         <div class="grid grid--three">
         {% for profile in profiles %}
                   <div class="column card">
             <div class="dev">
-              <a href="/profile.html" class="card__body">
+              <a href="{% url 'user-profile' profile.pk %}" class="card__body">
                 <div class="dev__profile">
                   <img class="avatar avatar--md" src="{{ profile.profile_image.url}}" alt="image" />
                   <div class="dev__meta">
@@ -42,24 +42,13 @@
                  {{profile.about|slice:"50"}}
                 </p>
                 <div class="dev__skills">
+                <!-- Skill output -->
+                  
+                  {% for skill in profile.skill_set.all %}
                   <span class="tag tag--pill tag--main">
-                    <small>JavaScript</small>
+                    <small>{{skill}}</small>
                   </span>
-                  <span class="tag tag--pill tag--main">
-                    <small>React</small>
-                  </span>
-                  <span class="tag tag--pill tag--main">
-                    <small>SCSS</small>
-                  </span>
-                  <span class="tag tag--pill tag--main">
-                    <small>Nodejs</small>
-                  </span>
-                  <span class="tag tag--pill tag--main">
-                    <small>Express</small>
-                  </span>
-                  <span class="tag tag--pill tag--main">
-                    <small>GraphQL</small>
-                  </span>
+                  {% endfor %}
                 </div>
               </a>
             </div>
