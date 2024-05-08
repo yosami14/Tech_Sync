@@ -4,9 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .forms import UserForm
+from .forms import UserForm,ProfileForm
 from django.contrib import messages
-
 
 #Authentication
 
@@ -52,13 +51,21 @@ def registerUser(request):
             messages.success(request, 'User account was created!')
 
             login(request, user)
-            return redirect('Profiles')
+            messages.info(request, 'Please complete your profile.')
+            return redirect('edit-account')
 
         else:
             messages.error(request, 'An error has occurred during registration')
 
     context = {'form': form}
     return render(request, 'users/register.html', context)
+
+
+
+
+
+
+
 
 # Profile list
 def Profiles(request):
@@ -93,3 +100,19 @@ def userAccount(request):
         'projects': projects,
     }
     return render(request, 'users/account.html', context)
+
+#Edit User Account
+@login_required(login_url='login')
+def editAccount(request):
+    profile = request.user.profile
+    form = ProfileForm(instance=profile)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+
+            return redirect('user-account')
+
+    context = {'form': form}
+    return render(request, 'users/profile_form.html', context)
