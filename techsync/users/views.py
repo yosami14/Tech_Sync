@@ -60,7 +60,7 @@ def registerUser(request):
     context = {'form': form}
     return render(request, 'users/register.html', context)
 
-
+# Profile list
 def Profiles(request):
     profiles = Profile.objects.all()
     context = {
@@ -68,6 +68,7 @@ def Profiles(request):
     }
     return render(request, 'users/profiles.html',context)
 
+#Single user profile data
 def userProfile(request, pk):
     profile = Profile.objects.get(id=pk)
     topSkills = profile.skill_set.exclude(description__exact="")
@@ -79,6 +80,16 @@ def userProfile(request, pk):
     }
     return render(request, 'users/user-profile.html', context) 
 
+
+#User Account Main Page
+@login_required(login_url='login')
 def userAccount(request):
-    context = {}
+    profile = request.user.profile
+    skills = profile.skill_set.all()
+    projects = profile.project_set.all()
+    context = {
+        'profile': profile,
+        'skills': skills,
+        'projects': projects,
+    }
     return render(request, 'users/account.html', context)
