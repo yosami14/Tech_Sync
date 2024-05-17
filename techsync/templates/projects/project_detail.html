@@ -8,9 +8,9 @@
         <div class="column column--1of3">
           <h3 class="singleProject__subtitle">Tools & Stacks</h3>
           <div class="singleProject__toolStack">
-            {% for tag in tags %}
+            {% for tags in project.tags.all %}
             <span class="tag tag--pill tag--sub tag--lg">
-                <small>{{ tag.name }}</small>
+                <small>{{ tags.name }}</small>
               </span>
             {% endfor %}
           </div>
