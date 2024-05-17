@@ -20,13 +20,17 @@ def project_detail(request, pk):
     }
     return render(request, 'projects/project_detail.html', context)
 
+# create user and assosiate user with the project
 @login_required(login_url='login')
 def createProject(request):
     form = ProjectForm()
+    profile = request.user.profile
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            project = form.save(commit=False)
+            project.owner = profile
+            project.save()
             return redirect('projects')
 
     context = {
@@ -39,7 +43,8 @@ def createProject(request):
 #UPDATE PROJECT
 @login_required(login_url='login')
 def updateProject(request, pk):
-    project = Project.objects.get(id = pk)
+    profile = request.user.profile
+    project = profile.project_set.get(id = pk)
     form = ProjectForm(instance = project)
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES, instance=project)
@@ -56,14 +61,15 @@ def updateProject(request, pk):
 #DELETE PROJECT
 @login_required(login_url='login')
 def deleteProject(request, pk):
-    project = Project.objects.get(id=pk)
+    profile = request.user.profile
+    project = profile.project_set.get(id = pk)
     if request.method == 'POST':
         project.delete()
-        return redirect('projects')
+        return redirect('account')
     context = {
         'project': project,
     }
-    return render (request, 'projects/delete_template.html', context)
+    return render (request, 'main/delete_template.html', context)
 
 
 from django.http import JsonResponse

@@ -1,20 +1,6 @@
 {% extends "main/main.html" %}
 {% block content %}
 
-<table>
-
-    
-    {% for project in projects %}
-    <tr>
-        <td><a href="{% url 'project_detail' project.pk %}">{{ project.title }}</a></td>
-        <td>{{ project.vote_ratio }}%</td>
-        <td>{{ project.vote_count }}</td>
-        <td>{{ project.created_at}}</td>
-        <td><a href="{% url 'delete-template' project.pk %}">Delete</a></td>
-        <td><a href="{% url 'update-project' project.pk %}">Edit</a></td>
-    </tr>
-    {% endfor %}
-<table/>
   <!-- Main Section -->
   <main class="projects">
     <section class="hero-section text-center">
@@ -43,30 +29,31 @@
             
 
           {% for project in projects %}
-          <div class="column">
-            <div class="card project">
-              <a href="{% url 'project_detail' project.pk %}" class="project">
-                <img class="project__thumbnail" src="{{project.image.url}}" alt="project thumbnail" />
-                <div class="card__body">
-                  <h3 class="project__title">{{ project.title }}</h3>
-                  <p><a class="project__author" href="{% url 'user-profile' project.owner.pk %}">By {{project.owner.name}}</a></p>
-                  <p class="project--rating">
-                    <span style="font-weight: bold;">{{ project.vote_ratio }}%</span> Postitive
-                    Feedback ({{ project.vote_count }}) Vote
-                  </p>
-                  <div class="project__tags">
-                    {% for tag in project.tags.all %}
+            <div class="column">
+              <div class="card project">
+                <a href="{% url 'project_detail' project.pk %}" class="project">
+                  <img class="project__thumbnail" src="{{project.image.url}}" alt="project thumbnail" />
+                  <div class="card__body">
+                    <h3 class="project__title">{{ project.title }}</h3>
+                    {% if project.owner %}
+                      <p><a class="project__author" href="{% url 'user-profile' project.owner.pk %}">By {{project.owner.name}}</a></p>
+                    {% else %}
+                      <p class="project__author">By Anonymous</p>
+                    {% endif %}
+                    <p class="project--rating">
+                      <span style="font-weight: bold;">{{ project.vote_ratio }}%</span> Postitive
+                      Feedback ({{ project.vote_count }}) Vote
+                    </p>
+                    <div class="project__tags">
+                      {% for tag in project.tags.all %}
                         <span class="tag tag--pill tag--main">
-                            <small>{{ tag.name }}</small>
+                          <small>{{ tag.name }}</small>
                         </span>
-                    {% endfor %}
-
-
+                      {% endfor %}
+                    </div>
                   </div>
                 </div>
-              </a>
-            </div>
-          </div>
+              </div>
           {% endfor %}
 
         </div>

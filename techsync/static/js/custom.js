@@ -1,21 +1,19 @@
-console.log("Script loaded")
-// For Selectize.js in tech stack/tool selection 
 $(document).ready(function() {
-    $('.selectize-tags').selectize({
+    $('.skill-select').selectize({
+        maxItems: 1, // Set maximum items to 1
         plugins: ['remove_button'],
         delimiter: ',',
-        maxOptions: 3,
         persist: false,
         create: function(input) {
             return {
                 value: input,
                 text: input
-            }
+            };
         },
         load: function(query, callback) {
             if (!query.length) return callback();
             $.ajax({
-                url: '/get_tags/', // URL to fetch tags dynamically
+                url: '/get_skills/', // URL to fetch skills dynamically
                 type: 'GET',
                 dataType: 'json',
                 data: {
@@ -31,7 +29,4 @@ $(document).ready(function() {
         }
     });
 });
-
-
-
 
