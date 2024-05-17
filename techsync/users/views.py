@@ -7,6 +7,10 @@ from django.contrib.auth.forms import UserCreationForm
 from .forms import UserForm,ProfileForm,SkillForm
 from django.contrib import messages
 from django.http import JsonResponse
+
+from django.db.models import Q
+from .utils import get_search_profile
+
 #Authentication
 
 def loginUser(request):
@@ -68,13 +72,16 @@ def registerUser(request):
 
 
 # Profile list
-def Profiles(request):
-    profiles = Profile.objects.all()
-    context = {
-        'profiles': profiles
-    }
-    return render(request, 'users/profiles.html',context)
 
+
+def Profiles(request):
+    search_query = request.GET.get('search_query', '')
+    profiles = get_search_profile(search_query)
+    context = {
+        'profiles': profiles,
+        'search_query': search_query,
+    }
+    return render(request, 'users/profiles.html', context)
 #Single user profile data
 def userProfile(request, pk):
     profile = Profile.objects.get(id=pk)
