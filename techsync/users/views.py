@@ -84,6 +84,7 @@ def Profiles(request):
         'custom_range': custom_range,
     }
     return render(request, 'users/profiles.html', context)
+
 #Single user profile data
 def userProfile(request, pk):
     profile = Profile.objects.get(id=pk)
