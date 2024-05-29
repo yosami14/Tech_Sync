@@ -3,11 +3,15 @@ from django.contrib.auth.models import User
 from users.models import User,Profile
 import uuid
 import os
+
+
+
 # Create your models here.
 # def image_filename(instance, filename):
 #     base_filename, file_extension = os.path.splitext(filename)
 #     return f"project_images/{instance.title}_{instance.user.username}{file_extension}"
 
+#Project Model
 class Project(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     owner = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
@@ -25,8 +29,10 @@ class Project(models.Model):
     
     def __str__(self):
         return self.title
+    class Meta:
+        ordering = ['-created_at']
 
-
+#Review Model
 class Review(models.Model):
     VOTE_TYPE = (
         ('up', 'Up Vote'),

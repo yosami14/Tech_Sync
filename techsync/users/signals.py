@@ -1,4 +1,6 @@
-#single signal for both User and Profile
+def deleteUser(sender, instance, **kwargs):
+    if instance.user_id is not None:
+        instance.user.delete()#single signal for both User and Profile
 from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 from .models import User, Profile
@@ -24,8 +26,14 @@ def updateUser(sender, instance, created, **kwargs):
         # profile.save()  # remove this line
 
 def deleteUser(sender, instance, **kwargs):
-    instance.user.delete()
+    try:
+        instance.user.delete()
+    except User.DoesNotExist:
+        pass
+
+
 
 post_save.connect(createProfile, sender=User)
 post_save.connect(updateUser, sender=Profile)
 post_delete.connect(deleteUser, sender=Profile)
+

@@ -4,18 +4,19 @@ from .forms import ProjectForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 # Create your views here.
-from .utils import get_project_search_results
-
+from .utils import get_project_search_results, paginateProjects
 # projects
 def projects(request):
     search_query = request.GET.get('search_query', '')
     projects = get_project_search_results(search_query)
+    custom_range, projects = paginateProjects(request, projects, 6)
+
     context = {
         'projects': projects,
         'search_query': search_query,
+        'custom_range':custom_range,
     }
     return render(request,'projects/projects.html',context)
-
 
 def project_detail(request, pk):
     project = Project.objects.get(id=pk)
@@ -29,22 +30,21 @@ def project_detail(request, pk):
 # create user and assosiate user with the project
 @login_required(login_url='login')
 def createProject(request):
-    form = ProjectForm()
     profile = request.user.profile
+    form = ProjectForm()
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.owner = profile
             project.save()
+            form.save_m2m()  # Save the many-to-many data
             return redirect('projects')
 
     context = {
         'form': form,
-
     }
     return render(request, 'projects/project_form.html',context)
-
 
 #UPDATE PROJECT
 @login_required(login_url='login')
@@ -65,16 +65,14 @@ def updateProject(request, pk):
     return render(request, 'projects/project_form.html',context)
 
 #DELETE PROJECT
-@login_required(login_url='login')
+@login_required(login_url="login")
 def deleteProject(request, pk):
     profile = request.user.profile
-    project = profile.project_set.get(id = pk)
+    project = profile.project_set.get(id=pk)
     if request.method == 'POST':
         project.delete()
-        return redirect('account')
-    context = {
-        'project': project,
-    }
+        return redirect('projects')
+    context = {'object': project}
     return render (request, 'main/delete_template.html', context)
 
 
