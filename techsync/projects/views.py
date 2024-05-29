@@ -9,7 +9,7 @@ from .utils import get_project_search_results, paginateProjects
 def projects(request):
     search_query = request.GET.get('search_query', '')
     projects = get_project_search_results(search_query)
-    custom_range, projects = paginateProjects(request, projects, 6)
+    custom_range, projects = paginateProjects(request, projects,3 )
 
     context = {
         'projects': projects,
