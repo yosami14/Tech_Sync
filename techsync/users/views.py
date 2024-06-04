@@ -188,3 +188,15 @@ def deleteSkill(request, pk):
 
     context = {'object': skill}
     return render(request, 'main/delete_template.html', context)
+
+
+@login_required(login_url='login')
+def inbox(request):
+    profile = request.user.profile
+    messageRequests = profile.messages.all()
+    unreadCount = messageRequests.filter(is_read=False).count()
+    context = {
+        'messageRequests': messageRequests,
+        'unreadCount': unreadCount,
+    }
+    return render(request, 'users/inbox.html', context)
