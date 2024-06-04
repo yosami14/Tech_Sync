@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, SelectMultiple
-from .models import Project, Tag
+from .models import Project, Review,Tag
 from django import forms
 
 class ProjectForm(ModelForm):
@@ -21,3 +21,15 @@ class ProjectForm(ModelForm):
                 field.widget.attrs.update({'class': 'input'})
 
 
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
+        fields = ['value','body']
+        labels = {
+            'body': 'Enter your comment here',
+            'value': 'Vote for this project'
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+                field.widget.attrs.update({'class': 'input'})

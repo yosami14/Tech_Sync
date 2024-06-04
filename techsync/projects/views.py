@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
 from .models import Project, Tag
-from .forms import ProjectForm
+from .forms import ProjectForm, ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.contrib import messages
 # Create your views here.
 from .utils import get_project_search_results, paginateProjects
 # projects
@@ -21,9 +22,22 @@ def projects(request):
 def project_detail(request, pk):
     project = Project.objects.get(id=pk)
     tags = project.tags.all()
+    form = ReviewForm()
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        review = form.save(commit=False)
+        review.project = project
+        review.owner = request.user.profile
+        review.save()
+
+        project.getVoteCount
+        messages.success(request, 'Your review was successfully submitted!')
+        return redirect('project_detail',pk = project.id)
     context = {
         'project': project,
         'tags': tags,
+        'form': form,
+
     }
     return render(request, 'projects/project_detail.html', context)
 
@@ -78,6 +92,7 @@ def deleteProject(request, pk):
 
 from django.http import JsonResponse
 from .models import Tag
+
 
 def get_tags(request):
     term = request.GET.get('q', '')
