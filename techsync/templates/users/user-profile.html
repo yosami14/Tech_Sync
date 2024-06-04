@@ -31,7 +31,7 @@
                   <a title="Personal Website" href="{{ profile.personal_link }}" target="_blank"><i class="im im-globe"></i></a>
                 </li>
               {% endif %}
-              <a href="#" class="btn btn--sub btn--lg">Send Message </a>
+              <a href="{% url 'create-inbox' profile.id %}" class="btn btn--sub btn--lg">Send Message </a>
             </div>
           </div>
         </div>

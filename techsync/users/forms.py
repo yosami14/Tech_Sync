@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from .models import Profile
 from django.forms import ModelForm
-from .models import Skill
+from .models import Skill,Message
 from django import forms
 class UserForm(UserCreationForm):
     class Meta:
@@ -46,3 +46,14 @@ class SkillForm(forms.ModelForm):
         # Add the class 'skill-select' to the 'name' field
         self.fields['name'].widget.attrs.update({'class': 'input skill-select', 'placeholder': 'Search for a skill...'})
 
+
+class InboxForm(ModelForm):
+    class Meta:
+        model = Message
+        fields = ['senderName', 'email', 'subject', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super(InboxForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input'})

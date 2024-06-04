@@ -8,7 +8,7 @@
       <ul class="messages">
         {% for message in messageRequests %}
         <li class="message {% if not message.is_read %}message--unread{% endif %}">
-            <a href="message.html">
+            <a href="{% url 'inbox-message' message.pk%}">
                 <span class="message__author">{{message.senderName}}</span>
                 <span class="message__subject">{{message.subject}}</span>
                 <span class="message__date">{{message.created_at}}</span>

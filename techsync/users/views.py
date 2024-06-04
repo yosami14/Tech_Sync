@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from .forms import UserForm,ProfileForm,SkillForm
+from .forms import UserForm,ProfileForm,SkillForm,InboxForm
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -200,3 +200,43 @@ def inbox(request):
         'unreadCount': unreadCount,
     }
     return render(request, 'users/inbox.html', context)
+
+
+@login_required(login_url='login')
+def viewInbox(request, pk):
+    profile = request.user.profile
+    message = profile.messages.get(id=pk)
+    if message.is_read == False:
+        message.is_read = True
+        message.save()
+    context = {'message': message}
+    return render(request, 'users/message.html', context)
+
+
+def createInbox(request, pk):
+    recipient = Profile.objects.get(id=pk)
+    form = InboxForm()
+    sender = request.user.profile
+
+    if request.method == 'POST':
+        form = InboxForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = sender
+            message.recipient = recipient
+
+            if sender and sender.name and sender.user.email:
+                message.senderName = sender.name
+                message.email = sender.user.email
+            message.save()
+
+            messages.success(request, 'Your message was successfully sent!')
+            return redirect('user-profile', pk=recipient.id)
+
+    # Debugging wanted to check if the recipient and sender are correct
+    print(f'Recipient: {recipient}') 
+    print(f'Sender Name: {sender.name if sender else None}')
+    print(f'Sender Email: {sender.user.email if sender else None}') 
+
+    context = {'recipient': recipient, 'form': form}
+    return render(request, 'users/message_form.html', context)
