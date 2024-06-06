@@ -1,0 +1,32 @@
+:root {
+    --color-sub: #13141b;
+    --color-main: #8cfef6;
+    --color-main-light: #45a29e;
+    /* buttons */
+    --color-sub-light: #272b39;
+    --color-sub-lighter: #c5c6c7;
+    /* subtext */
+    --color-text: #b2b1b1;
+    --color-gray: #ffffff;
+    /* Maintext, navbar text, and border */
+    --color-light: #66fcf1;
+    
+    --color-light-gray: #ecedef;
+    /* Below section and search label */
+    --color-bg: #272b39;
+    /* cards */
+    --color-white: #5b6178;
+    --color-white-light: #c5c6c7;
+    
+    --color-success: #359e64;
+    --color-success-bg: #def8e8;
+    --color-error: #fc4b0b;
+    --color-error-bg: #fff2ee;
+    --font-base: 'Poppins', arial, helvetica, 'Segoe UI', roboto, ubuntu, sans-serif;
+    --font-monospace: 'Fira Code', 'Courier New', courier, monospace;
+    --font-regular: 300;
+    --font-medium: 500;
+    --font-bold: 700;
+    --generic-shadow: 1px 1px 5px #00000010;
+    --generic-transition: all 0.3s ease-in-out;
+  }

@@ -1,7 +1,8 @@
 :root {
   --color-main: #5aa5b9;
   --color-main-light: #e6faff;
-  --color-sub: #3f4156;
+  --color-sub: #0b0c10;
+  /* --color-sub: #3f4156; */
   --color-sub-light: #51546e;
   --color-sub-lighter: #ededfd;
   --color-text: #737373;

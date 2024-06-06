@@ -1,27 +1,78 @@
 {% load static %}
-  <!-- Header Section -->
-  <header class="header">
+<!-- Header Section -->
+<header class="header">
     <div class="container container--narrow">
-      <a href="{% url 'projects'%}" class="header__logo">
-        <img src="" alt="Techsync Logo" />
-      </a>
-      <nav class="header__nav">
-        <input type="checkbox" id="responsive-menu" />
-        <label for="responsive-menu" class="toggle-menu">
-          <span>Menu</span>
-          <div class="toggle-menu__lines"></div>
-        </label>
-        <ul class="header__menu">
-          <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
-          <li class="header__menuItem"><a  href="{% url 'projects' %}">Projects</a></li>
-          {% if request.user.is_authenticated %}
-          <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li> 
-          <li class="header__menuItem"><a  href="{% url 'user-account'%}">Account</a></li>
-            <li class="header__menuItem"><a href="{% url 'logout' %}"  class="btn btn--sub">Logout</a></li>
-          {% else %}
-            <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>
-          {% endif %}
-        </ul>
-      </nav>
+        <a href="{% url 'projects'%}" class="header__logo">
+            <img src="" alt="Techsync Logo" />
+        </a>
+        <nav class="header__nav">
+            <input type="checkbox" id="responsive-menu" />
+            <label for="responsive-menu" class="toggle-menu">
+                <span>Menu</span>
+                <div class="toggle-menu__lines"></div>
+            </label>
+            <ul class="header__menu">
+                <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
+                <li class="header__menuItem"><a  href="{% url 'projects' %}">Projects</a></li>
+                {% if request.user.is_authenticated %}
+                <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li> 
+                <li class="header__menuItem"><a  href="{% url 'user-account'%}">Account</a></li>
+                <li class="header__menuItem"><a href="{% url 'logout' %}"  class="btn btn--sub">Logout</a></li>
+                {% else %}
+                <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <span id="mode-icon" class="fas fa-sun"></span> <!-- Sun icon as default -->
     </div>
-  </header>
+</header>
+
+
+<style>
+    /* Moon icon */
+    .fa-moon {
+        color: #4a90e2; /* Vibrant blue */
+    }
+
+    /* Sun icon */
+    .fa-sun {
+        color: #ffbf00; /* Sun-like color */
+    }
+</style>
+
+</style>
+<link rel="stylesheet" href="{% static 'uikit/styles/modules/_variables.css' %}" id="theme-css">
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const modeIcon = document.getElementById('mode-icon');
+      const body = document.body;
+
+      // Function to toggle between moon and sun icons
+      function toggleModeIcon() {
+          body.classList.toggle('dark-mode');
+          modeIcon.classList.toggle('fa-moon', body.classList.contains('dark-mode'));
+          modeIcon.classList.toggle('fa-sun', !body.classList.contains('dark-mode'));
+          
+          // Store the mode preference
+          localStorage.setItem('mode', body.classList.contains('dark-mode') ? 'dark' : 'light');
+
+          // Load corresponding CSS file based on mode
+          const cssLink = document.getElementById('theme-css');
+          if (body.classList.contains('dark-mode')) {
+              cssLink.href = "{% static 'uikit/styles/modules/_variables-dark.css' %}";
+          } else {
+              cssLink.href = "{% static 'uikit/styles/modules/_variables.css' %}";
+          }
+      }
+
+      // Check if mode preference is stored in local storage
+      const mode = localStorage.getItem('mode');
+      if (mode === 'dark') {
+          toggleModeIcon(); // Switch to dark mode if stored preference is dark
+      }
+
+      // Attach onclick event to the mode icon
+      modeIcon.onclick = toggleModeIcon;
+  });
+</script>
+
