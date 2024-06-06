@@ -19,25 +19,36 @@ def projects(request):
     }
     return render(request,'projects/projects.html',context)
 
+
+
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+
 def project_detail(request, pk):
     project = Project.objects.get(id=pk)
     tags = project.tags.all()
-    form = ReviewForm()
+    
     if request.method == 'POST':
         form = ReviewForm(request.POST)
-        review = form.save(commit=False)
-        review.project = project
-        review.owner = request.user.profile
-        review.save()
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.project = project
+            review.owner = request.user.profile
+            review.save()
 
-        project.getVoteCount
-        messages.success(request, 'Your review was successfully submitted!')
-        return redirect('project_detail',pk = project.id)
+            # Update the vote count and ratio
+            project.update_vote_count()
+
+            return JsonResponse({'message': 'Review submitted successfully!'}, status=200)
+        else:
+            return JsonResponse({'errors': form.errors}, status=400)
+    else:
+        form = ReviewForm()
+
     context = {
         'project': project,
         'tags': tags,
         'form': form,
-
     }
     return render(request, 'projects/project_detail.html', context)
 

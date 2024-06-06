@@ -21,15 +21,20 @@ class ProjectForm(ModelForm):
                 field.widget.attrs.update({'class': 'input'})
 
 
-class ReviewForm(ModelForm):
+
+class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['value','body']
+        fields = [ 'body','value']
         labels = {
+            'value': 'Vote for this project',
             'body': 'Enter your comment here',
-            'value': 'Vote for this project'
+            
         }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-                field.widget.attrs.update({'class': 'input'})
+            field.widget.attrs.update({'class': 'input'})
+        # Add hidden field for vote value
+        self.fields['value_hidden'] = forms.CharField(widget=forms.HiddenInput())

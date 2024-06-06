@@ -41,8 +41,11 @@
                       <p class="project__author">By Anonymous</p>
                     {% endif %}
                     <p class="project--rating">
-                      <span style="font-weight: bold;">{{ project.vote_ratio }}%</span> Postitive
-                      Feedback ({{ project.vote_count }}) Vote
+                      {% if project.vote_count > 0 %}
+                        <span style="font-weight: bold;">{{ project.vote_ratio }}%</span> Positive Feedback ({{ project.vote_count }}) Vote
+                      {% else %}
+                        No feedback yet
+                      {% endif %}
                     </p>
                     <div class="project__tags">
                       {% for tag in project.tags.all %}

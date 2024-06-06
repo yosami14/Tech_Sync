@@ -31,19 +31,23 @@ class Project(models.Model):
         return self.title
     class Meta:
         ordering = ['-created_at']
-    @property
-    def reviwers(self):
-        queryset = self.review_set.all().values_list('owner__id',flat=True)
-        return queryset
-    @property
-    def getVoteCount(self):
+
+
+
+    def update_vote_count(self):
         reviews = self.review_set.all()
         upVotes = reviews.filter(value='up').count()
         totalVotes = reviews.count()
 
-        ratio = (upVotes/totalVotes) * 100
-        self.vote_total = totalVotes
+        if totalVotes > 0:
+            ratio = (upVotes / totalVotes) * 100
+        else:
+            ratio = 0
+
+        self.vote_count = totalVotes
         self.vote_ratio = ratio
+        self.save()
+
 #Review Model
 class Review(models.Model):
     VOTE_TYPE = (
@@ -57,9 +61,10 @@ class Review(models.Model):
     value = models.CharField(max_length=10, choices=VOTE_TYPE)
     created_at = models.DateTimeField(auto_now_add=True)
     # updated_at = models.DateTimeField(auto_now=True)
-    class Meta:
-        #only one comment for same  project
-        unique_together = [['owner', 'project']]
+    
+    #class Meta:
+        ##only one comment for same  project
+        #unique_together = [['owner', 'project']]
 
     def __str__(self):
         return self.value + ' ' + str(self.project)
