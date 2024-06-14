@@ -1,0 +1,20 @@
+{% extends "main/main.html" %}
+{% block content %}
+    <div>
+        <div>
+            <h5>{{room.id}} -- <a href="room/{{room.id}}">{{room.name}}</a></h5>
+            <h5>Members:</h5>
+            <ul>
+                {% for member in room.participants.all %}
+                    <li>{{member.username}}</li>
+                {% endfor %}
+            </ul>
+            <h5>Messages:</h5>
+            <ul>
+                {% for chat in chats %}
+                    <li>{{chat.user.username}}: {{chat.body}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock content %}
