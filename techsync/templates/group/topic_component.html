@@ -1,0 +1,10 @@
+<h3>Rooms</h3>
+<hr>
+<div>
+    <a href="{% url 'home-group'%}">All</a>
+</div>
+{% for topic in topics %}
+    <div>
+        <a href="{% url 'home-group'%}?q={{topic.name}}">{{topic.name}}</a>
+    </div>
+{% endfor %}

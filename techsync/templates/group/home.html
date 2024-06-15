@@ -11,36 +11,17 @@
 
 <div class='home-container'>
         <div>
-            <h3>Rooms</h3>
-            <hr>
-            <div>
-                <a href="{% url 'home-group'%}">All</a>
-            </div>
-            {% for topic in topics %}
-                <div>
-                    <a href="{% url 'home-group'%}?q={{topic.name}}">{{topic.name}}</a>
-                </div>
-            {% endfor %}
+            {% include "group/topic_component.html" %}
         </div>
         <div>
             <h5>{{room_count}} Rooms</h5>
             <a href="{% url 'create-room' %}">Create Room</a>
-                {% for room in rooms %}
-                <div>
-                    {% if request.user == room.host %}
-                    <a href="{% url 'update-room' room.pk %}">Update Room</a>
-                    <a href="{% url 'delete-room' room.pk %}">Delete Room</a>
-                    {% endif %}
-                    <span>@{{room.host.username}} </span>
-                    <h5><a href="{% url 'room' room.id %}">{{room.name}}</a></h5>
-                    <small>{{room.topic.name}}</small>
-                </div>
-
-                {% endfor %}
+            {% include "group/feed_component.html" %}
+                
         </div>
-
+{% comment %} Activity {% endcomment %}
         <div>
-            <h3>Recent Activity</h3>
+            {% include "group/activity_component.html" %}
         </div>
 
 </div>
