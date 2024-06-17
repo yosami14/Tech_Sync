@@ -7,9 +7,11 @@
         <a href="{% url 'home-group'%}" class="active">All <span>{{topics.count}}</span></a>
       </li>
     {% for topic in topics %}
+        {% if topic.room_set.all.count > 0 %}
         <li>
             <a href="{% url 'home-group'%}?q={{topic.name}}">{{topic.name}}<span>{{topic.room_set.all.count}}</span></a>
         </li>
+        {% endif %}
       {% endfor %}
     </ul>
     <a class="btn btn--link" href="topics.html">
