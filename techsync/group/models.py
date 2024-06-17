@@ -33,9 +33,13 @@ class Message(models.Model):
     body = models.TextField()
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    # decending order
+    # class Meta:
+    #     ordering = ['-updated', '-created']
 
+    # ascending order
     class Meta:
-        ordering = ['-updated', '-created']
+        ordering = ['updated', 'created']
 
     def __str__(self):
         return self.body[0:50]

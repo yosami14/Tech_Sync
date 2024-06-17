@@ -1,0 +1,50 @@
+{% extends "main/main.html" %}
+{% block content %}
+<style>
+    .room-container {
+        display: flex;
+        justify-content: space-between;
+    }
+    .room-content {
+        width: 75%;
+    }
+    .participant-section {
+        width: 20%;
+    }
+</style>
+<div class="room-container">
+    <div class="room-content">
+        <h5><a href="room/{{room.id}}">{{room.name}}</a></h5>
+        <h5>Messages:</h5>
+        <ul>
+            
+            {% for message in room_messages %}
+                {% if request.user == message.user %}
+                    <a href="{%  url 'delete-message' message.id %}">Delete</a>
+                {% endif %}
+                <small>@{{message.user}} {{message.created|timesince}} Ago</small>
+                <li>{{message.user.username}}: {{message.body}}</li>
+            {% endfor %}
+
+        </ul>
+
+        {% if request.user.is_authenticated %}
+            <div class="comment-form">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type='text' name="body" placeholder='Write yout message here ...'/>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="participant-section">
+        <h3>Participants</h3>
+        <ul>
+            {% for participant in participants %}
+                <li>@{{ participant.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}

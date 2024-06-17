@@ -102,8 +102,10 @@ def deleteMessage(request, pk):
         return HttpResponse('Your are not allowed here!!')
 
     if request.method == 'POST':
+        room_id = message.room.id  # get the id of the room
         message.delete()
-        return redirect('home-group')
+        return redirect('room', pk=room_id)  # redirect to the room
+
     context = {'object': message}
     return render(request, 'main/delete_template.html', context)
 
