@@ -1,4 +1,5 @@
 from .models import *
+from group.models import Room, Topic,Message
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import login,logout, authenticate
@@ -104,10 +105,15 @@ def userAccount(request):
     profile = request.user.profile
     skills = profile.skill_set.all()
     projects = profile.project_set.all()
+    
+    
+    rooms = Room.objects.filter(host=request.user)
+
     context = {
         'profile': profile,
         'skills': skills,
         'projects': projects,
+        'rooms': rooms,
     }
     return render(request, 'users/account.html', context)
 

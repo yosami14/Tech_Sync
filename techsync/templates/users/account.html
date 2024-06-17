@@ -97,9 +97,33 @@
             {% endfor %}
 
           </table>
-        </div>
+<!--  Room  -->
+<div class="settings">
+  <h3 class="settings__title">ROOMS HOSTED BY @{{profile.username}}</h3>
+  <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-room' %}"><i class="im im-plus"></i> Create Rooms</a>
+</div>
+
+<table class="settings__table">
+  {% for room in rooms %}
+  <tr>
+    <td class="settings__tableInfo">
+      <a href="{% url 'room' room.id %}">{{room.name}}</a>
+      <p>
+        {{room.description|truncatewords:20}}
+      </p>
+    </td>
+    <td class="settings__tableActions">
+      <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-room' room.id %}"><i class="im im-edit"></i> Edit</a>
+      <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-room' room.id %}?next=/account"><i class="im im-x-mark-circle-o"></i>
+        Delete</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+        
       </div>
     </div>
+  </div>
   </main>
   {% endblock content %}
   
