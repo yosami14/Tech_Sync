@@ -73,20 +73,18 @@ def updateRoom(request, pk):
     form = RoomForm(instance=room)
     topics = Topic.objects.all()
     if request.user != room.host:
-        return HttpResponse('You are not allowed to view this page.')
+        return HttpResponse('Your are not allowed here!!')
 
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room)
-        if form.is_valid():
-            form.save()
-            return redirect('home-group')
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
+        return redirect('home-group')
 
-
-    context = {
-        'room': room,
-        'form': form,
-        'topics': topics,
-        }
+    context = {'form': form, 'topics': topics, 'room': room}
     return render(request, 'group/room_form.html', context)
 
 
