@@ -1,8 +1,19 @@
-<a href="/">
-    <h1>logo</h1>
-</a>
+<section class="hero-section text-center">
+    <div class="container container--narrow">
+      <div class="hero-section__box">
+        <h2>Search for <span>Rooms</span></h2>
+      </div>
 
-<form action="{% url 'home-group' %}" method="get">
-    <input type="text" name="q" placeholder="Search">
-    <input type="submit" value="Search">
-</form>
+      <div class="hero-section__search">
+        <form id='searchForm' class="form" action="{% url 'home-group' %}" method="get">
+          <div class="form__field">
+            <label for="formInput#search">Search By Rooms </label>
+            <input class="input input--text" id="formInput#search" type="text" name="q"
+            placeholder="Search Rooms by title, description, owner, or tags" value="{{ search_query }}" />
+          </div>
+
+          <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+        </form>
+      </div>
+    </div>
+  </section>
