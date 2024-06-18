@@ -67,6 +67,9 @@
 
                         </ul>
                 </nav>
+                {% comment %} {% include "main/language_selector.html" %} {% endcomment %}
+                <div id="google_translate_element"></div>
+
                 <span id="mode-icon" class="fas fa-sun"></span> <!-- Sun icon as default -->
         </div>
 </header>
@@ -88,7 +91,9 @@
     }
 </style>
 
-</style>
+
+
+
 <link rel="stylesheet" href="{% static 'uikit/styles/modules/_variables.css' %}" id="theme-css">
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -123,4 +128,22 @@
       modeIcon.onclick = toggleModeIcon;
   });
 </script>
+
+
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,om,am,so,ti', // Add languages: Oromo, Amharic, Somali, Tigrinya
+        }, 'google_translate_element');
+    }
+</script>
+
+
+
+
+
+
 
