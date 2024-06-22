@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    #channel
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'projects',
     'users',
     'group',
+    'a_rtchat',
 ]
 
 MIDDLEWARE = [
@@ -78,8 +81,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'techsync.wsgi.application'
+# WSGI_APPLICATION = 'techsync.wsgi.application'
+ASGI_APPLICATION = 'techsync.asgi.application'
 
+# channel layer cofig
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('projects/',include('projects.urls')),
     path('group/',include('group.urls')),
+    path('chatroom/',include('a_rtchat.urls')),
     path('',include('users.urls')),
 
     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="main/reset_password.html"),

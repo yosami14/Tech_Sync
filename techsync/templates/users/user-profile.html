@@ -31,7 +31,10 @@
                   <a title="Personal Website" href="{{ profile.personal_link }}" target="_blank"><i class="im im-globe"></i></a>
                 </li>
               {% endif %}
-              <a href="{% url 'create-inbox' profile.id %}" class="btn btn--sub btn--lg">Send Message </a>
+              {% comment %} <a href="{% url 'create-inbox' profile.id %}" class="btn btn--sub btn--lg">Send Message </a> {% endcomment %}
+              {% if profile.user != user %}
+                <a href="{% url 'start-chat' profile.user.username %}" class="btn btn--sub btn--lg">Send Message </a>
+              {% endif %}
             </div>
           </div>
         </div>

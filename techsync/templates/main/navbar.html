@@ -16,7 +16,8 @@
                                 <li class="header__menuItem"><a  href="{% url 'projects' %}">Projects</a></li>
                                 <li class="header__menuItem"><a  href="{% url 'home-group'%}">Group</a></li>
                                 {% if request.user.is_authenticated %}
-                                <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li> 
+                                {% comment %} <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li>  {% endcomment %}
+                                <li class="header__menuItem"><a  href="{% url 'user-chatrooms' %}">Inbox</a></li> 
                                 
                                 {% else %}
                                 <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>

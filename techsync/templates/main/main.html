@@ -38,8 +38,6 @@
     <link rel="stylesheet" href="{% static 'styless/style.css' %}" />
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
 
-
-
   <title>TechSync</title>
   
 </head>
@@ -62,6 +60,9 @@
 
 
     {% block content %}
+      {% block layout %}
+
+      {% endblock %}
     {% endblock content %}
 
 </body>
