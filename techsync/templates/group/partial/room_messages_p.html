@@ -1,0 +1,19 @@
+<div id="message_threadssss" hx-swap-oob="beforeend"> 
+  <div id="messageContainer" class="fade-in">
+    {% include "group/room_messages.html" %}
+  </div>
+  <style>
+    .fade-in {
+      animation: fadeIn 1s;
+    }
+    
+    @keyframes fadeIn {
+      0% {opacity: 0;}
+      100% {opacity: 1;}
+    }
+  </style>
+  
+  <script>
+    scrollToBottom();
+  </script>
+</div>

@@ -1,9 +1,10 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import Room, Topic,Message
 from .forms import RoomForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+
 
 from django.db.models.functions import Lower
 
@@ -31,9 +32,29 @@ def home(request):
     return render(request, 'group/home.html', context)
 
 
+# @login_required(login_url='login')
+# def room(request, pk):
+#     room = Room.objects.get(id=pk)
+#     room_messages = room.message_set.all()
+#     participants = room.participants.all()
+
+#     if request.method == 'POST':
+#         message = Message.objects.create(
+#             user=request.user,
+#             room=room,
+#             body=request.POST.get('body')
+#         )
+#         room.participants.add(request.user)
+#         return redirect('room', pk=room.id)
+
+#     context = {'room': room, 'room_messages': room_messages,
+#                'participants': participants}
+#     return render(request, 'group/room.html', context)
+
+
 @login_required(login_url='login')
 def room(request, pk):
-    room = Room.objects.get(id=pk)
+    room = get_object_or_404(Room, id=pk)
     room_messages = room.message_set.all()
     participants = room.participants.all()
 
@@ -43,12 +64,18 @@ def room(request, pk):
             room=room,
             body=request.POST.get('body')
         )
-        room.participants.add(request.user)
-        return redirect('room', pk=room.id)
+        context = {
+            'message': message,
+            'room': room,
+            'request': request, 
+        }
+        return render(request, 'group/partial/room_messages_p.html', context)
 
-    context = {'room': room, 'room_messages': room_messages,
-               'participants': participants}
+    room.participants.add(request.user)
+    context = {'room': room, 'room_messages': room_messages, 'participants': participants}
     return render(request, 'group/room.html', context)
+
+
 
 
 @login_required(login_url='login')
