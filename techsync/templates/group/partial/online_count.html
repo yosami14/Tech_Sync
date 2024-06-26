@@ -1,0 +1,55 @@
+{% comment %} Online count {% endcomment %}
+
+<span id="room-online-count" hx-swap-oob="outerHTML">{{online_count}} online</span>
+
+
+{% comment %} Online participant {% endcomment %}
+<div class="participants__list scroll" id="groupchat-members" >
+    {% for participant in participants %}
+
+    <a href="{% url 'user-profile' participant.profile.id %}" class="participant">
+        {% if participant in chat_group.users_online.all %}
+        <div class="avatar avatar--medium online" style="background-color: #54ed35;">
+            <img src="{{participant.profile.profile_image.url}}" />
+        </div>
+{% comment %} Style for online {% endcomment %}
+        <style>
+            .avatar.online::after {
+                content: "";
+                display: block;
+                position: absolute;
+                background-color:  #54ed35;
+                z-index: 111;
+                border-radius: 50%;
+                border: 0.3rem solid var(--color-dark);
+            }
+            </style>
+        {% else %}
+      <div class="avatar avatar--medium offline" >
+        <img src="{{participant.profile.profile_image.url}}" />
+        <style>
+            .avatar.offline::after {
+                content: "";
+                display: block;
+                position: absolute;
+                background-color:  #808080;
+                z-index: 111;
+                border-radius: 50%;
+                border: 0.3rem solid var(--color-dark);
+            }
+            </style>
+      </div>
+    {% endif %}
+
+      <p>
+        {{participant.profile.name}}
+        <span>@{{ participant.username }}</span>
+      </p>
+    </a>
+
+    {% endfor %}
+    <button onclick="copyToClipboard()" style="background-color: #696D97; color: #5EF5F0;">Invite Link</button>
+  </div>
+
+
+

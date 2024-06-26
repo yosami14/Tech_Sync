@@ -70,8 +70,10 @@ def room(request, pk):
             'request': request, 
         }
         return render(request, 'group/partial/room_messages_p.html', context)
-
-    room.participants.add(request.user)
+    if room.name:
+        if request.user not in room.participants.all():
+            room.participants.add(request.user)
+            
     context = {'room': room, 'room_messages': room_messages, 'participants': participants}
     return render(request, 'group/room.html', context)
 

@@ -16,6 +16,7 @@
             </svg>
           </a>
           <h3 style = "font-size: 1.17em">{{room.name}}</h3>
+          <span id="room-online-count">{{online_count}} Online</span>
         </div>
         {% if room.host == request.user %}
         <div class="room__topRight">
@@ -99,11 +100,11 @@
     <!--   Start -->
     <div class="participants">
       <h3 class="participants__top" style="font-size: 1.17em" >Participants <span>({{participants.count}} Joined)</span></h3>
-      <div class="participants__list scroll">
+      <div class="participants__list scroll" id="groupchat-members" >
         {% for participant in participants %}
 
         <a href="{% url 'user-profile' participant.profile.id %}" class="participant">
-          <div class="avatar avatar--medium">
+          <div class="avatar avatar--medium" >
             <img src="{{participant.profile.profile_image.url}}" />
           </div>
           <p>
@@ -113,6 +114,7 @@
         </a>
 
         {% endfor %}
+        <button onclick="copyToClipboard()" style="background-color: #696D97; color: #5EF5F0;">Invite Link</button>
       </div>
     </div>
     <!--  End -->
@@ -127,6 +129,15 @@
   }
   scrollToBottom();
 </script>
+
+<script>
+  function copyToClipboard() {
+      navigator.clipboard.writeText(document.location.href)
+          .then(() => alert('URL copied to clipboard'))
+          .catch(err => console.error('Could not copy text: ', err));
+  }
+  </script>
+
 <script src="script.js"></script>
 
 {% endblock content %}
