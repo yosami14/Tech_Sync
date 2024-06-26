@@ -1,9 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Room, Topic,Message
-from .forms import RoomForm
+from users.models import User, Profile
+from .forms import RoomForm,ChatRoomEditForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.http import Http404
+from django.contrib import messages
 
 
 from django.db.models.functions import Lower
@@ -171,3 +174,44 @@ def activityPage(request):
 #     context = {'user': user, 'rooms': rooms,
 #                'room_messages': room_messages, 'topics': topics}
 #     return render(request, 'base/profile.html', context)
+
+
+#Manage users
+
+
+
+
+@login_required(login_url='login')
+def manage_group(request, pk):
+    room = get_object_or_404(Room, id=pk)
+    if request.user != room.host:
+        raise Http404()
+    
+    form = ChatRoomEditForm(instance=room) 
+    
+    if request.method == 'POST':
+        remove_members = request.POST.getlist('remove_members')
+        for member_id in remove_members:
+            member = User.objects.get(id=member_id)
+            room.participants.remove(member)  
+                
+        return redirect('room', pk=room.id) 
+    
+    context = {
+        'room' : room
+    }   
+    return render(request, 'group/room_manage_group.html', context)
+
+@login_required(login_url='login')
+def leave_group(request, pk):
+    room = get_object_or_404(Room, id=pk)
+    if request.user not in room.participants.all():
+        raise Http404()
+
+    if request.method == 'POST':
+        room.participants.remove(request.user)
+        messages.success(request, "You left the chat")
+        return redirect('home-group')  # redirect to the room
+
+    context = {'object': room}
+    return render(request, 'main/delete_template.html', context)

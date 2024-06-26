@@ -25,4 +25,5 @@ urlpatterns = [
     path('inbox-message/<str:pk>', views.viewInbox, name='inbox-message'),
     path('send-inbox/<str:pk>', views.createInbox, name='create-inbox'),
 
+   
 ]

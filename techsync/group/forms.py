@@ -7,3 +7,12 @@ class RoomForm(ModelForm):
         model = Room
         fields = '__all__'
         exclude = ['host', 'participants']
+
+
+class ChatRoomEditForm(ModelForm):
+    class Meta:
+        model = Room
+        fields = ['name']
+        # widgets = {
+
+        # }

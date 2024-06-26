@@ -1,0 +1,79 @@
+{% extends 'main/main.html' %}
+
+{% block content %} 
+
+<h1>Manage Users</h1>
+
+{% comment %} 
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+
+    <div class="my-4">
+    <h2>Members</h2>
+    {% for member in room.participants.all %}
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2 py-2">
+            <img class="w-14 h-14 rounded-full object-cover" src="{{ member.profile.avatar }}" />
+            <div>
+                <span class="font-bold">{{ member.profile.name }}</span> 
+                <span class="text-sm font-light text-gray-600">@{{ member.username }}</span>
+            </div>
+        </div>
+        
+        {% if member != room.host %}
+        <div class="inline-block pr-4">
+            <input type="checkbox" name="remove_members" value="{{ member.id }}" class="relative p-5 cursor-pointer appearance-none rounded-md border after:absolute after:left-0 after:top-0 after:h-full after:w-full after:bg-[url('https://img.icons8.com/ffffff/32/multiply.png')] after:bg-center checked:bg-red-500 hover:ring hover:ring-gray-300 focus:outline-none" />
+        </div>
+        {% endif %}
+    </div> 
+    {% endfor %}
+    </div>
+
+    <button class="mt-2" type="submit">Update</button>
+</form> 
+{% endcomment %}
+
+{% comment %} <a href="{% url 'chatroom-delete' chat_group.group_name %}" class="flex justify-end mt-4 text-gray-400 hover:text-red-500" >Delete Chatroom</a> {% endcomment %}
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+        <!--   Start -->
+        <div class="participants">
+            <h3 class="participants__top" style="font-size: 1.17em" >Participants <span>({{participants.count}} Joined) </span> <span>Confirm<button class="mt-2" type="submit">Update</button> </span> </h3>
+            <div class="participants__list scroll" id="groupchat-members" >
+              {% for participant in room.participants.all %}
+      
+                <a href="{% url 'user-profile' participant.profile.id %}" class="participant">
+                    <div class="avatar avatar--medium" >
+                    <img src="{{participant.profile.profile_image.url}}" />
+                    </div>
+                    <p>
+                    {{participant.profile.name}}
+                    <span>@{{ participant.username }}</span>
+                    </p>
+                </a>
+                
+                {% if participant != room.host %}
+                <div class="inline-block pr-4 side-manage-btn">
+                    <input type="checkbox" name="remove_members" value="{{ participant.id }}" class="relative p-5 cursor-pointer appearance-none rounded-md border after:absolute after:left-0 after:top-0 after:h-full after:w-full after:bg-[url('https://img.icons8.com/ffffff/32/multiply.png')] after:bg-center checked:bg-red-500 hover:ring hover:ring-gray-300 focus:outline-none" />
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          
+        </form>
+        <style>
+            <style>
+            .participant, .side-manage-btn {
+                flex-basis: 50%;
+            }
+            
+            .participant-container {
+                display: flex;
+            }
+            </style>
+            </style>
+{% endblock %}

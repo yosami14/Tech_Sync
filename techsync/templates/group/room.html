@@ -18,8 +18,8 @@
           <h3 style = "font-size: 1.17em">{{room.name}}</h3>
           <span id="room-online-count">{{online_count}} Online</span>
         </div>
-        {% if room.host == request.user %}
         <div class="room__topRight">
+          {% if room.host == request.user %}
           <a href="{% url 'update-room' room.id %}?next=/room">
             <svg enable-background="new 0 0 24 24" height="32" viewBox="0 0 24 24" width="32"
               xmlns="http://www.w3.org/2000/svg">
@@ -47,8 +47,23 @@
               </path>
             </svg>
           </a>
+          <a  href="{% url 'manage-group' room.id %}?next={% url 'room' room.id %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>Setting</title>
+              <i class="fas fa-cog"></i>
+            </svg>
+          </a>
+
+          {% endif %}
+          {% if request.user != room.host %}
+          <a  href="{% url 'leave-group' room.id %}?next={% url 'home-group' %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>Leave Room</title>
+              <i class="fas fa-sign-out-alt"></i>
+            </svg>
+          </a>
+          {% endif %}
         </div>
-        {% endif %}
 
       </div>
       <div class="room__box scroll">
