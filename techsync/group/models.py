@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User
 import uuid
+import os
+from PIL import Image
 # Create your models here.
 class Topic(models.Model):
     name = models.CharField(max_length=200)
@@ -34,17 +36,30 @@ class Message(models.Model):
     file = models.FileField(upload_to='files/', blank=True, null=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    # decending order
-    # class Meta:
-    #     ordering = ['-updated', '-created']
 
-    # ascending order
-    class Meta:
-        ordering = ['updated', 'created']
+    @property
+    def filename(self):
+        if self.file:
+            return os.path.basename(self.file.name)
+        else:
+            return None
+        
     def __str__(self):
         if self.body:
             return self.body[0:50]
         elif self.file:
-            return str(self.file)
+            return str(self.filename)
         else:
             return super().__str__()
+    # ascending order
+    class Meta:
+        ordering = ['updated', 'created']
+
+    @property
+    def is_image(self):
+        try:
+            image = Image.open(self.file) 
+            image.verify()
+            return True 
+        except:
+            return False
