@@ -25,7 +25,8 @@
         {% endif %}
       </div>
       <div class="thread__details">
-        {{message.body}}
+        {% comment %} Message output with files {% endcomment %}
+        {% include "group/partial/message_content.html" %}
   </div>
 </div>
 

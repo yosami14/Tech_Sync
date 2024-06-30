@@ -108,6 +108,22 @@
             {% csrf_token %}
             <input name="body" placeholder="Write your message here..." />
         </form>
+      {% comment %} File input {% endcomment %}
+      <form id="chat_file_form" enctype="multipart/form-data" class="file-upload-form" 
+        hx-post="{% url 'room-file-upload' room.id %}"
+        hx-target="#message_threadssss"
+        hx-swap="beforeend" 
+        hx-include="*"
+        _="on htmx:beforeSend reset() me" >
+      {% csrf_token %}
+          <input type="file" name="file" id="id_file" class="file-input">
+          <a href="#">
+            <button type="submit" class="submit-button">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </a>
+      </form>
+
       </div>
     </div>
     <!-- Room End -->
@@ -135,10 +151,35 @@
     <!--  End -->
   </div>
 </main>
+<style>
+  .file-upload-form {
+    display: flex;
+    align-items: center;
+}
 
+.file-input {
+    margin-right: 10px; /* Adds space between the input and button */
+}
+
+.submit-button {
+    background: none;
+    border: none;
+    color: #69DBDC; /* Customize the icon color */
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submit-button:focus {
+    outline: none;
+}
+</style>
 
 <script>
-  function scrollToBottom() {
+  function scrollToBottom(time=0) {
+    setTimeout(function() {
+      const container = document.getElementById('messagescroll_id');
+      container.scrollTop = container.scrollHeight;
+    }, time);
     const container = document.getElementById('message_threadssss');
     container.scrollTop = container.scrollHeight;
   }

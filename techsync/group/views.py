@@ -4,6 +4,9 @@ from users.models import User, Profile
 from .forms import RoomForm,ChatRoomEditForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.http import Http404
 from django.contrib import messages
@@ -215,3 +218,29 @@ def leave_group(request, pk):
 
     context = {'object': room}
     return render(request, 'main/delete_template.html', context)
+
+
+# FILE UPLOAD
+def room_file_upload(request, pk):
+    room = get_object_or_404(Room, id=pk)
+    
+    if request.htmx and request.FILES:
+        file = request.FILES['file']
+        message = Message.objects.create(
+            file = file,
+            user = request.user, 
+            room = room,
+        )
+        channel_layer = get_channel_layer()
+        event = {
+            'type': 'chat_message',
+            'message': str(message.id),  # convert UUID to string
+        }
+        async_to_sync(channel_layer.group_send)(
+            pk, 
+            event
+        )
+    
+    context = {'room': room, 'message': message}  # Add your context here
+    html = render_to_string("group/partial/room_messages_p.html", context)
+    return HttpResponse(html)

@@ -20,5 +20,7 @@ urlpatterns = [
     #setting
     path('manage-group/<str:pk>', views.manage_group, name="manage-group"),
     path('leave-group/<str:pk>', views.leave_group, name="leave-group"),
+    # File input
+    path('room/fileupload/<str:pk>', views.room_file_upload, name="room-file-upload"),
 
 ]   
