@@ -4,18 +4,26 @@ def deleteUser(sender, instance, **kwargs):
         
 from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
-from .models import User, Profile
+from .models import User, Profile, EventOrganizer
 from django.core.mail import send_mail
 from django.conf import settings
+
 #Single signal for both User and Profile
-def createProfile(sender, instance, created, **kwargs):
-    print('Signal Triggered')
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(
-            user=instance,
-            username=instance.username,
-            name=instance.first_name,
-        )
+        if instance.is_event_organizer:
+            EventOrganizer.objects.create(
+                user=instance,
+                username=instance.username,
+                name=instance.first_name,
+            )
+        else:
+            Profile.objects.create(
+                user=instance,
+                username=instance.username,
+                name=instance.first_name,
+            )
 
         subject = f'Welcome to TechSync, {instance.first_name}!'
         message = (
@@ -38,26 +46,33 @@ def createProfile(sender, instance, created, **kwargs):
             fail_silently=False,
         )
 
-#update user and profile signal
-def updateUser(sender, instance, created, **kwargs):
-    profile = instance
-    user = profile.user
-    
-    if created == False:
-        user.username = profile.username
-        user.first_name = profile.name
+@receiver(post_save, sender=Profile)
+def update_user(sender, instance, created, **kwargs):
+    user = instance.user
+    if not created:
+        user.username = instance.username
+        user.first_name = instance.name
         user.save(update_fields=['username', 'first_name'])
-        # profile.save()  # remove this line
 
-def deleteUser(sender, instance, **kwargs):
+@receiver(post_delete, sender=Profile)
+def delete_user(sender, instance, **kwargs):
     try:
         instance.user.delete()
     except User.DoesNotExist:
         pass
 
+@receiver(post_save, sender=EventOrganizer)
+def update_user_event_organizer(sender, instance, created, **kwargs):
+    user = instance.user
+    if not created:
+        user.username = instance.username
+        user.first_name = instance.name
+        user.save(update_fields=['username', 'first_name'])
 
-
-post_save.connect(createProfile, sender=User)
-post_save.connect(updateUser, sender=Profile)
-post_delete.connect(deleteUser, sender=Profile)
+@receiver(post_delete, sender=EventOrganizer)
+def delete_user_event_organizer(sender, instance, **kwargs):
+    try:
+        instance.user.delete()
+    except User.DoesNotExist:
+        pass
 

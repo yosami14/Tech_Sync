@@ -7,10 +7,10 @@
           <img src="" alt="icon" />
         </a>
         <h3>Account SignUp</h3>
-        <p>Create a new developer account</p>
+        <p>Create a new Event Organizer account</p>
       </div>
 
-      <form action="{% url 'register'%}" method="POST" class="form auth__form">
+      <form action="{% url 'register-organizer'%}" method="POST" class="form auth__form">
         {% csrf_token %}
         <!-- Register Form -->
         {% for field in form %}
@@ -36,10 +36,7 @@
         <p>Already have an Account?</p>
         <a href="{% url 'login' %}">Log In</a>
       </div>
-      <div class="auth__alternative">
-        <p>Register As Event organizer</p>
-        <a href="{% url 'register-organizer' %}">Sign-Up</a>
-      </div>
+
     </div>
   </div>
 {% endblock content %}

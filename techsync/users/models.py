@@ -54,7 +54,7 @@ class EventModerator(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     assigned_events = models.ManyToManyField('event.Event', blank=True, related_name='assigned_moderators')
-    profile_image = models.ImageField(null=True, blank=True, upload_to='moderators', default='default_moderator.png')
+    profile_image = models.ImageField(null=True, blank=True, upload_to='moderators', default='default_profile.png')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -73,23 +73,24 @@ class ModerationHistory(models.Model):
 class EventOrganizer(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    organization_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=200, blank=True,null=True)
+    username = models.CharField(max_length=200, blank=True,null=True,unique=True)
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(null=True, blank=True, upload_to='organizers', default='default_organizer.png')
+    profile_image = models.ImageField(null=True, blank=True, upload_to='organizers', default='default_profile.png')
     verified = models.BooleanField(default=False)
     twitter_link = models.CharField(max_length=200, blank=True, null=True)
     linkedin_link = models.CharField(max_length=200, blank=True, null=True)
     facebook_link = models.CharField(max_length=200, blank=True, null=True)
     more_link = models.CharField(max_length=200, blank=True, null=True)
-    status = models.CharField(max_length=20, default='active')
+    status = models.BooleanField(default=True)#false to deactivate/delete
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.organization_name
+        return self.user.username
     
 
 

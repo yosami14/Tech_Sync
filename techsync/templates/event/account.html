@@ -7,15 +7,15 @@
         <div class="column column--1of3">
           <div class="card text-center">
             <div class="card__body dev">
-              <a class="tag tag--pill tag--main settings__btn" href="{% url 'edit-organizaaccount' %}"><i class="im im-edit"></i> Edit</a>
+              <a class="tag tag--pill tag--main settings__btn" href="{% url 'edit-organizer-profile' %}"><i class="im im-edit"></i> Edit</a>
               <img class="avatar avatar--xl dev__avatar" src="{{ profile.profile_image.url }}" />
               <h2 class="dev__name">{{profile.name}}</h2>
-              <p class="dev__title">{{profile.headline}}</p>
-              <p class="dev__location">Based in {{profile.location}}</p>
+              <p class="dev__title">{{profile.contact_phone}} | {{profile.contact_email}}</p>
+              <p class="dev__location">Based in {{profile.address}}</p>
               <ul class="dev__social">
                   {% if profile.github_link %}
                   <li>
-                    <a title="Github" href="{{ profile.github_link }}" target="_blank"><i class="im im-github"></i></a>
+                    <a title="Github" href="{{ profile.website }}" target="_blank"><i class="im im-github"></i></a>
                   </li>
                 {% endif %}
                 {% if profile.twitter_link %}
@@ -30,7 +30,7 @@
                 {% endif %}
                 {% if profile.personal_link %}
                   <li>
-                    <a title="Personal Website" href="{{ profile.personal_link }}" target="_blank"><i class="im im-globe"></i></a>
+                    <a title="Personal Website" href="{{ profile.facebook_link }}" target="_blank"><i class="im im-globe"></i></a>
                   </li>
                 {% endif %}
               </ul>
@@ -42,12 +42,12 @@
           <div class="devInfo">
             <h3 class="devInfo__title">About Me</h3>
             <p class="devInfo__about">
-              {{profile.about}}
+              {{profile.bio}}
             </p>
           </div>
           <div class="settings">
-            <h3 class="settings__title">Skills</h3>
-            <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'add-skill'%}"><i class="im im-plus"></i> Add Skill</a>
+            <h3 class="settings__title">Events</h3>
+            <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'add-skill'%}"><i class="im im-plus"></i> Add Events</a>
           </div>
 <!--  Skills  -->
           <table class="settings__table">
