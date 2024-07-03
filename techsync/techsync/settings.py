@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'users',
     'group',
     'a_rtchat',
+    'event',
 ]
 
 MIDDLEWARE = [
