@@ -19,7 +19,7 @@ class Event(models.Model):
     location = models.CharField(max_length=255)
     organizer = models.ForeignKey(EventOrganizer, on_delete=models.CASCADE)
     category = models.ManyToManyField(EventCategory, blank=True)
-    event_image = models.ImageField(null=True, blank=True, upload_to='events', default='default_event.png')
+    event_image = models.ImageField(upload_to='events', default='default_event.png')
     attendees = models.ManyToManyField(User, blank=True, related_name='attending_events')
     speakers = models.ManyToManyField(Profile, blank=True, related_name='speaking_events')
 

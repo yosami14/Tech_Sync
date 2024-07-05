@@ -45,52 +45,29 @@
               {{profile.bio}}
             </p>
           </div>
+
+<!--  Events  -->
           <div class="settings">
             <h3 class="settings__title">Events</h3>
             <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'add-event'%}"><i class="im im-plus"></i> Add Events</a>
           </div>
-<!--  Skills  -->
-          <table class="settings__table">
-            {% for skill in skills %}
-            <tr>
-              <td class="settings__tableInfo">
-                <h4>{{skill.name}}</h4>
-                <p>
-                  {{skill.description|truncatewords:20}}
-                </p>
-              </td>
-              <td class="settings__tableActions">
-                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-skill' skill.id %}"><i class="im im-edit"></i> Edit</a>
-                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-skill' skill.id %}?next=/account"><i class="im im-x-mark-circle-o"></i>
-                  Delete</a>
-              </td>
-            </tr>            
-            {% endfor %}
-
-
-          </table>
-<!--  Projects  -->
-          <div class="settings">
-            <h3 class="settings__title">Projects</h3>
-            <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-project' %}"><i class="im im-plus"></i> Add Project</a>
-          </div>
 
           <table class="settings__table">
-            {% for project in projects %}
+            {% for event in events %}
             <tr>
               <td class="settings__thumbnail">
-                <a href="{% url 'project_detail' project.pk %}"><img src="{{project.image.url}}" alt="Project Thumbnail" /></a>
+                <a href="{% url 'event-detail' event.id %}"><img src="{{event.event_image.url}}" alt="event Thumbnail" /></a>
               </td>
               <td class="settings__tableInfo">
-                <a href="{% url 'project_detail' project.pk %}">{{project.title}}</a>
+                <a href="{% url 'event-detail' event.id %}">{{event.title}}</a>
                 <p>
-                  {{project.description|truncatewords:20}}
+                  {{event.description|truncatewords:20}}
                 </p>
               </td>
               <td class="settings__tableActions">
-                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-project' project.pk %}"><i class="im im-edit"></i> Edit</a>
-                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-project' project.pk %}?next=/account"><i class="im im-x-mark-circle-o"></i>
-                  Delete</a>
+                {% comment %} <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-event' event.pk %}"><i class="im im-edit"></i> Edit</a>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-event' event.pk %}?next=/account"><i class="im im-x-mark-circle-o"></i>
+                  Delete</a> {% endcomment %}
               </td>
             </tr>
             

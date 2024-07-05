@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
 from users.models import User, Profile
-from event.models import EventCategory
+from event.models import EventCategory,Event,EventOrganizer
 from .forms import OrganizerForm,ProfileForm, EventForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -96,15 +96,48 @@ def addEvent(request):
     }
     return render(request, 'event/event_form.html', context)
 
-
+# selectize 
 def get_speakers(request):
     term = request.GET.get('q', '')
     speakers = Profile.objects.filter(user__username__icontains=term)
     results = [{'value': speaker.user.username, 'text': speaker.user.username} for speaker in speakers]
     return JsonResponse(results, safe=False)
-
+# selectize 
 def get_event_categories(request):
     term = request.GET.get('q', '')
     categorys = EventCategory.objects.filter(user__username__icontains=term)
     results = [{'value': category.name, 'text': category.name} for category in categorys]
     return JsonResponse(results, safe=False)
+
+
+from datetime import timedelta
+
+def event_detail(request, pk):
+    event = Event.objects.get(id=pk)
+    #calculate the event duration
+    duration = event.end_date - event.date
+    total_seconds = duration.total_seconds()
+    days, remainder = divmod(total_seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, _ = divmod(remainder, 60)
+    
+    if days > 0:
+        duration_str = "{} day(s) {} hour(s)".format(int(days), int(hours))
+    else:
+        duration_str = "{} hour(s) {} minute(s)".format(int(hours), int(minutes))
+
+    context = {
+        'event': event,
+        'duration': duration_str,
+    }
+    return render(request, 'event/event_detail.html', context)
+#Organizer Profile
+def organizerProfile(request, pk):
+    organization = EventOrganizer.objects.get(id=pk)
+    events = organization.event_set.all()
+
+    context = {
+        'profile': organization, 
+        'events': events
+        }
+    return render(request, 'event/organizer_profile.html', context)
