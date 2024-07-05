@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #Apps
+    'ckeditor',
     #if u Encounter a error for signals or app 
     #'users.apps.UsersConfig',
     'projects',
@@ -164,3 +165,19 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'yosami2020@gmail.com'
 EMAIL_HOST_PASSWORD = 'rxdu uite hxsv zzdl'
+
+
+# CKEDITOR CONFIGS
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+# CKEDITOR_CONFIGS = {
+#     'default': {
+#         'skin': 'moono',
+#         'codeSnippet_theme': 'monokai',
+#         'toolbar': 'all',
+#         'extraPlugins': ','.join(
+#             [
+#                 'codesnippet','widget','dialog',
+#             ]
+#         ),
+#     },
+# }

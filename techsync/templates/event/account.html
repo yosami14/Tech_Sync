@@ -61,7 +61,7 @@
               <td class="settings__tableInfo">
                 <a href="{% url 'event-detail' event.id %}">{{event.title}}</a>
                 <p>
-                  {{event.description|truncatewords:20}}
+                  {{event.description|truncatewords:20|safe}}
                 </p>
               </td>
               <td class="settings__tableActions">

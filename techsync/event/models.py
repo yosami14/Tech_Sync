@@ -1,7 +1,8 @@
 from django.db import models
 from users.models import User, EventModerator, EventOrganizer,Profile
 import uuid
-
+#from ckeditor_uploader.fields import RichTextUploadingField
+from ckeditor.fields import RichTextField
 class EventCategory(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     name = models.CharField(max_length=200, unique=True)
@@ -13,7 +14,8 @@ class EventCategory(models.Model):
 class Event(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    # description = models.TextField()
+    description = RichTextField()
     date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     location = models.CharField(max_length=255)
