@@ -9,7 +9,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_event_organizer = models.BooleanField(default=False)
     is_event_moderator = models.BooleanField(default=False)
-    is_speaker = models.BooleanField(default=False)  # Flag to identify if user is a speaker
+    is_speaker = models.BooleanField(default=False)  # Flag to identify if user is a speaker (remove it there is no need for it)
 
     is_recruiter = models.BooleanField(default=False)
     is_applicant = models.BooleanField(default=False)

@@ -2,10 +2,11 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
-from users.models import User
-from .forms import OrganizerForm,ProfileForm
+from users.models import User, Profile
+from event.models import EventCategory
+from .forms import OrganizerForm,ProfileForm, EventForm
 from django.contrib.auth.decorators import login_required
-
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -68,3 +69,42 @@ def userAccount(request):
     return render(request, 'event/account.html', context)
 
 
+#Add Event
+@login_required(login_url='login')
+def addEvent(request):
+    organizer = request.user.eventorganizer
+    form = EventForm()
+
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = organizer
+            event.save()
+            form.save_m2m()  # Save the many-to-many data
+            messages.success(request, "Event added successfully.")
+            return redirect('organization-account')
+        else:
+            # Handle form errors and display them
+            for field, errors in form.errors.items():
+                field_name = form.fields[field].label if field in form.fields else field
+                for error in errors:
+                    messages.error(request, f"Error with '{field_name}': {error}")
+
+    context = {
+        'form': form
+    }
+    return render(request, 'event/event_form.html', context)
+
+
+def get_speakers(request):
+    term = request.GET.get('q', '')
+    speakers = Profile.objects.filter(user__username__icontains=term)
+    results = [{'value': speaker.user.username, 'text': speaker.user.username} for speaker in speakers]
+    return JsonResponse(results, safe=False)
+
+def get_event_categories(request):
+    term = request.GET.get('q', '')
+    categorys = EventCategory.objects.filter(user__username__icontains=term)
+    results = [{'value': category.name, 'text': category.name} for category in categorys]
+    return JsonResponse(results, safe=False)
