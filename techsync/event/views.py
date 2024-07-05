@@ -7,6 +7,7 @@ from event.models import EventCategory,Event,EventOrganizer
 from .forms import OrganizerForm,ProfileForm, EventForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
@@ -110,6 +111,47 @@ def get_event_categories(request):
     return JsonResponse(results, safe=False)
 
 
+#UPDATE Event
+@login_required(login_url='login')
+def updateEvent(request, pk):
+    organizer = request.user.eventorganizer
+    event = organizer.event_set.get(id=pk)
+    form = EventForm(instance=event)
+
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.verified_by = None
+            event.is_verified = False
+            event.save()
+            messages.success(request, "Event updated successfully.")
+            return redirect('organization-account')
+
+    context = {
+        'form': form
+    }
+    return render(request, 'event/event_form.html', context)
+
+#DELETE PROJECT
+@login_required(login_url="login")
+def deleteEvent(request, pk):
+    organizer = request.user.eventorganizer
+    event = organizer.event_set.get(id=pk)
+    if request.method == 'POST':
+        event.delete()
+        return redirect('organization-account')
+    context = {'object': event}
+    return render (request, 'main/delete_template.html', context)
+
+
+
+
+
+
+
+
+
 from datetime import timedelta
 
 def event_detail(request, pk):
@@ -131,13 +173,15 @@ def event_detail(request, pk):
         'duration': duration_str,
     }
     return render(request, 'event/event_detail.html', context)
+
 #Organizer Profile
 def organizerProfile(request, pk):
-    organization = EventOrganizer.objects.get(id=pk)
+    organization = get_object_or_404(EventOrganizer, id=pk)
     events = organization.event_set.all()
 
     context = {
         'profile': organization, 
         'events': events
         }
+    
     return render(request, 'event/organizer_profile.html', context)
