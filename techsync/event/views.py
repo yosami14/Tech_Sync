@@ -185,3 +185,12 @@ def organizerProfile(request, pk):
         }
     
     return render(request, 'event/organizer_profile.html', context)
+
+
+# event list
+def events(request):
+    events = Event.objects.all()
+    context = {
+        'events': events
+    }
+    return render(request, 'event/events.html', context)

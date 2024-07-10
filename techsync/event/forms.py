@@ -33,24 +33,75 @@ class ProfileForm(ModelForm):
 
 
 
+# class EventForm(ModelForm):
+#     class Meta:
+#         model = Event
+#         fields = ['title', 'description', 'date', 'end_date', 'location', 'category', 'event_image', 'speakers']
+#         widgets = {
+#             'title': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event title'}),
+#             'description': Textarea(attrs={'class': 'textarea', 'placeholder': 'Enter event description'}),
+#             'date': DateTimeInput(attrs={'class': 'input', 'placeholder': 'Enter event date', 'type': 'datetime-local'}),
+#             'end_date': DateTimeInput(attrs={'class': 'input', 'placeholder': 'Enter event end date', 'type': 'datetime-local'}),
+#             'location': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event location'}),
+#             'category': SelectMultiple(attrs={'class': ' selectize-event-categories','placeholder': 'Add catergories'}),
+#             'speakers': SelectMultiple(attrs={'class': ' selectize-speakers','placeholder': 'Search Speakers username'})
+#         }
+
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         date = cleaned_data.get('date')
+#         end_date = cleaned_data.get('end_date')
+
+#         if date and end_date:
+#             if end_date < date:
+#                 raise ValidationError(_('End date cannot be earlier than the event date.'))
+
+#         return cleaned_data
+    
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for name, field in self.fields.items():
+#             if name != 'speakers' and name != 'category':
+#                 field.widget.attrs.update({'class': 'input'})
+
+
+
+from django import forms
+
 class EventForm(ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'date', 'end_date', 'location', 'category', 'event_image', 'speakers']
+        fields = [
+            'title', 'description', 'date', 'end_date', 
+            'category', 'event_image', 'speakers', 'location_type', 'location','venue_name', 'place', 
+        ]
         widgets = {
             'title': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event title'}),
             'description': Textarea(attrs={'class': 'textarea', 'placeholder': 'Enter event description'}),
             'date': DateTimeInput(attrs={'class': 'input', 'placeholder': 'Enter event date', 'type': 'datetime-local'}),
             'end_date': DateTimeInput(attrs={'class': 'input', 'placeholder': 'Enter event end date', 'type': 'datetime-local'}),
-            'location': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event location'}),
-            'category': SelectMultiple(attrs={'class': ' selectize-event-categories','placeholder': 'Add catergories'}),
-            'speakers': SelectMultiple(attrs={'class': ' selectize-speakers','placeholder': 'Search Speakers username'})
+            'location_type': forms.Select(attrs={'class': 'input'}),
+            'location': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event location', 'id': 'id_location'}),
+            'venue_name': TextInput(attrs={'class': 'input', 'placeholder': 'Enter venue name'}),
+            'place': TextInput(attrs={'class': 'input', 'placeholder': 'Enter place details (apartment, suite, etc.)'}),
+            'category': SelectMultiple(attrs={'class': 'selectize-event-categories', 'placeholder': 'Add categories'}),
+            'speakers': SelectMultiple(attrs={'class': 'selectize-speakers', 'placeholder': 'Search Speakers username'})
         }
 
     def clean(self):
         cleaned_data = super().clean()
         date = cleaned_data.get('date')
         end_date = cleaned_data.get('end_date')
+        location_type = cleaned_data.get('location_type')
+        location = cleaned_data.get('location')
+
+        if location_type == 'VENUE' and not location:
+            self.add_error('location', _('Location is required for venue events.'))
+
+        if location_type == 'ONLINE':
+            cleaned_data['location'] = 'Online'
+            cleaned_data['venue_name'] = ''
+            cleaned_data['place'] = ''
 
         if date and end_date:
             if end_date < date:
@@ -61,5 +112,5 @@ class EventForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            if name != 'speakers' and name != 'category':
+            if name != 'speakers' and name != 'category' and name != 'category':
                 field.widget.attrs.update({'class': 'input'})

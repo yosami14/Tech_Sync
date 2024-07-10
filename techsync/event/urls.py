@@ -17,8 +17,12 @@ urlpatterns = [
 
     path('event_detail/<str:pk>/', views.event_detail, name='event-detail'),
 
-    path('organizer_profile/<str:pk>/', views.organizerProfile, name='organzier-profile'),
+    path('organizer_profile/<str:pk>/', views.organizerProfile, name='organizer-profile'),
 
     path('update-event/<str:pk>', views.updateEvent, name='update-event'),
     path('delete-event/<str:pk>', views.deleteEvent, name='delete-event'),
+
+    # event list
+    path('', views.events, name='events'),
+
 ]

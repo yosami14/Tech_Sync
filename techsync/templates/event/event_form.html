@@ -10,18 +10,118 @@
                 <form class="form" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% for field in form %}
-                        <div class="form__field">
+                        <div class="form__field" id="field_{{ field.name }}">
                             <label for="formInput#text">{{ field.label }}</label>
                             {{ form.media }}
                             {{ field }}
+                            {% if field.name == 'location' %}
+                                <div id="location-suggestions" class="autocomplete-suggestions"></div>
+                            {% endif %}
                         </div>
                     {% endfor %}
-                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+                    <div id="map" style="height: 400px; margin-top: 20px; display: none;"></div>
+                    <input class="btn btn--sub btn--lg my-md" type="submit" value="Submit" />
                 </form>
             </div>
         </div>
     </main>
-    
 
+    <!-- Include Leaflet CSS and JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const locationInput = document.querySelector('input[name="location"]');
+        const suggestionsContainer = document.getElementById('location-suggestions');
+        const venueNameInput = document.querySelector('input[name="venue_name"]');
+        let map;
+
+        const locationTypeField = document.querySelector('select[name="location_type"]');
+        const locationField = document.getElementById('field_location');
+        const venueNameField = document.getElementById('field_venue_name');
+        const placeField = document.getElementById('field_place');
+        const mapDiv = document.getElementById('map');
+
+        function toggleVenueDetails() {
+            if (locationTypeField.value === 'VENUE') {
+                locationField.style.display = 'block';
+                venueNameField.style.display = 'block';
+                placeField.style.display = 'block';
+                mapDiv.style.display = 'block';
+                initMap();  // Initialize map if venue type is selected
+            } else {
+                locationField.style.display = 'none';
+                venueNameField.style.display = 'none';
+                placeField.style.display = 'none';
+                mapDiv.style.display = 'none';
+            }
+        }
+
+        locationTypeField.addEventListener('change', function() {
+            toggleVenueDetails();
+        });
+
+        function initMap() {
+            map = L.map('map').setView([0, 0], 2);  // Default view with zoom level 2
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
+        function updateMap(latlng) {
+            map.setView(latlng, 13);  // Set map view to the selected location
+            const marker = L.marker(latlng).addTo(map);
+            marker.bindPopup(locationInput.value).openPopup();
+        }
+
+        function suggestLocations(query) {
+            const geocoder = new L.Control.Geocoder.Nominatim();
+            geocoder.geocode(query, function(results) {
+                suggestionsContainer.innerHTML = '';  // Clear previous suggestions
+
+                results.forEach(function(result, index) {
+                    const suggestion = document.createElement('div');
+                    suggestion.classList.add('autocomplete-item');
+                    suggestion.textContent = result.name;
+                    suggestion.addEventListener('click', function() {
+                        // Update input fields and map with selected location
+                        locationInput.value = result.name;
+                        updateMap([result.center.lat, result.center.lng]);
+                        venueNameInput.value = extractVenueName(result.name);
+                        clearSuggestions();
+                    });
+                    suggestionsContainer.appendChild(suggestion);
+                });
+
+                suggestionsContainer.style.display = 'block';  // Show suggestions
+            });
+        }
+
+        function extractVenueName(location) {
+            // Logic to extract venue name from the location string
+            // Example logic: split by comma and take the first part
+            const parts = location.split(',');
+            return parts[0].trim();  // Return the first part trimmed
+        }
+
+        function clearSuggestions() {
+            suggestionsContainer.innerHTML = '';  // Clear suggestions
+            suggestionsContainer.style.display = 'none';  // Hide suggestions
+        }
+
+        locationInput.addEventListener('input', function() {
+            const query = locationInput.value.trim();
+            if (query.length > 2) {
+                suggestLocations(query);
+            } else {
+                clearSuggestions();
+            }
+        });
+
+        toggleVenueDetails();  // Call to set initial display
+    });
+    </script>
 {% endblock content %}

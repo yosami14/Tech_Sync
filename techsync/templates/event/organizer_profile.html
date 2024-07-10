@@ -65,7 +65,7 @@
               </div>
             </div>
           </div>
-          {% comment %} Projects {% endcomment %}
+          {% comment %} Events {% endcomment %}
           <div class="devInfo">
             <h3 class="devInfo__title">Upcoming Events</h3>
             <div class="grid grid--two">
@@ -79,7 +79,7 @@
                       <p><a class="project__author" href="{% url 'organzier-profile' event.pk %}">{{event.name}}</a></p>
                       <p class="event--description">
                         {{ event.description|truncatewords:20|safe }}
-                      </p>
+                      </p>~
                     </br>
                       <div class="project__tags">
                         {% for tag in event.category.all  %}

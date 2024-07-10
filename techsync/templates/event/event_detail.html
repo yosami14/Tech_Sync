@@ -16,34 +16,83 @@
                 </div>
 
                 <h3 class="singleProject__subtitle">Location</h3>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue_name }}" target="_blank">
                 <div class="singleProject__toolStack">
-
                     <span class="tag tag--pill tag--sub tag--lg">
                         <small>
-                            Location: <a href="{{ event.location }}" target="_blank">
-                                <i class="fas fa-map-marker-alt"></i> 
-                            </a>
-                        </small>
-                    </span>
+                            Location: 
+                                <i class="fas fa-map-marker-alt"></i> {{ event.venue_name }}
+                            </small>
+                        </span>
+                        
+                        <!-- Leaflet Map -->
+                        <div id="leaflet-map" style="height: 400px; margin-top: 20px;"></div>
+                    </div>
+                </a>
 
-                </div>
                 <h3 class="singleProject__subtitle">About this event</h3>
                 <div class="singleProject__toolStack">
                     <span class="tag tag--pill tag--sub tag--lg">
                         <small>
-                            <i class="fas fa-clock"></i> Event lasts : {{ duration }}
+                            <i class="fas fa-clock"></i> Event lasts: {{ duration }}
                         </small>
                     </span>
                 </div>
 
                 <h3 class="singleProject__subtitle">Categories</h3>
                 <div class="singleProject__toolStack">
-                    {% for tags in event.category.all %}
+                    {% for tag in event.category.all %}
                     <span class="tag tag--pill tag--sub tag--lg">
-                        <small>{{ tags.name }}</small>
+                        <small>{{ tag.name }}</small>
                     </span>
                     {% endfor %}
                 </div>
+            </div>
+
+            <div class="column column--2of3">
+                <img class="singleProject__preview" src="{{ event.event_image.url }}" alt="Event thumbnail" />
+                <a href="{% url 'organizer-profile' event.organizer.id %}" class="singleProject__developer">By {{ event.organizer.name }}</a>
+                <h5>{{ event.date }}</h5>
+                <h2 class="singleProject__title">{{ event.title }}</h2>
+                <h3 class="singleProject__subtitle">About the Event</h3>
+                <div class="singleProject__info">
+                    {{ event.description|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Include Leaflet CSS and JavaScript -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const locationName = "{{ event.location }}";
+    const mapDiv = L.map('leaflet-map').setView([0, 0], 2); // Default view with zoom level 2
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapDiv);
+
+    const geocoder = new L.Control.Geocoder.Nominatim();
+    geocoder.geocode(locationName, function(results) {
+        const latlng = [results[0].center.lat, results[0].center.lng];
+        mapDiv.setView(latlng, 13); // Set map view to the location
+        const marker = L.marker(latlng).addTo(mapDiv);
+        marker.bindPopup(locationName).openPopup();
+    });
+});
+</script>
+
+{% endblock %}
+
+
+
+
+
 
                 {% comment %} Event links {% endcomment %}
                 {% comment %} {% if event.source_link %}
@@ -53,22 +102,3 @@
                 <a class="singleProject__liveLink" href="#" target="_blank"><i class="im im-external-link"></i>Live Demo
                     {% endif %}
                 </a> {% endcomment %}
-            </div>
-            <div class="column column--2of3">
-                <img class="singleProject__preview" src="{{event.event_image.url}}" alt="Event thumbnail" />
-                <a href="{% url 'organzier-profile' event.organizer.id %}" class="singleProject__developer">By {{event.organizer.name}}</a>
-                <h5 class="">{{event.date}}</h5>
-                <h2 class="singleProject__title">{{event.title}}</h2>
-                <h3 class="singleProject__subtitle">About the Event</h3>
-                <div class="singleProject__info">
-                    {{event.description|safe}}
-                </div>
-
-
-            </div>
-        </div>
-    </div>
-</main>
-
-
-{% endblock %}
