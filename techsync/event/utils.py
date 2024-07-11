@@ -30,3 +30,18 @@ def paginateEvents(request, events, results):
     custom_range = range(leftIndex, rightIndex)
 
     return custom_range, events
+
+#Search Events
+def get_event_search_results(search_query):
+    if search_query:
+        events = Event.objects.distinct().filter(
+            Q(title__icontains=search_query) |
+            Q(category__name__icontains=search_query) |
+            Q(organizer__name__icontains=search_query) |
+            Q(speakers__name__icontains=search_query)
+
+        )
+    else:
+        events = Event.objects.all()
+    
+    return events

@@ -8,17 +8,19 @@ from .forms import OrganizerForm,ProfileForm, EventForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from .utils import  paginateEvents
+from .utils import  paginateEvents, get_event_search_results
 
 
 # Create your views here.
 
 # event list
 def events(request):
-    events = Event.objects.all()
+    search_query = request.GET.get('search_query', '')
+    events = get_event_search_results(search_query)
     custom_range, events = paginateEvents(request, events,3 )
     context = {
         'events': events,
+        'search_query': search_query,
         'custom_range': custom_range,
     }
     return render(request, 'event/events.html', context)
