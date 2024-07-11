@@ -27,6 +27,23 @@
                         
                         <!-- Leaflet Map -->
                         <div id="leaflet-map" style="height: 400px; margin-top: 20px;"></div>
+                        
+                        <!-- Transportation Icons -->
+                        <span style="text-align: center; display: block; margin-top: 20px;"> How to get there </span>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=driving" target="_blank" title="Car">
+                                <i class="fas fa-car fa-2x"></i>
+                            </a>
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=walking" target="_blank" title="Walking" style="margin-left: 20px;">
+                                <i class="fas fa-walking fa-2x"></i>
+                            </a>
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=transit" target="_blank" title="Bus" style="margin-left: 20px;">
+                                <i class="fas fa-bus fa-2x"></i>
+                            </a>
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=bicycling" target="_blank" title="Cycle" style="margin-left: 20px;">
+                                <i class="fas fa-bicycle fa-2x"></i>
+                            </a>
+                        </div>
                     </div>
                 </a>
 
