@@ -4,6 +4,8 @@ from .forms import ProjectForm, ReviewForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 # Create your views here.
 from .utils import get_project_search_results, paginateProjects
 # projects
@@ -21,8 +23,6 @@ def projects(request):
 
 
 
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
 
 def project_detail(request, pk):
     project = Project.objects.get(id=pk)

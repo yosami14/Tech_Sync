@@ -8,9 +8,26 @@ from .forms import OrganizerForm,ProfileForm, EventForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from .utils import  paginateEvents
 
 
 # Create your views here.
+
+# event list
+def events(request):
+    events = Event.objects.all()
+    custom_range, events = paginateEvents(request, events,3 )
+    context = {
+        'events': events,
+        'custom_range': custom_range,
+    }
+    return render(request, 'event/events.html', context)
+
+
+
+
+
+
 # User Creation
 def registerOrganizer(request):
     if request.user.is_authenticated:
@@ -178,19 +195,14 @@ def event_detail(request, pk):
 def organizerProfile(request, pk):
     organization = get_object_or_404(EventOrganizer, id=pk)
     events = organization.event_set.all()
+    
 
     context = {
         'profile': organization, 
-        'events': events
+        'events': events,
+        
         }
     
     return render(request, 'event/organizer_profile.html', context)
 
 
-# event list
-def events(request):
-    events = Event.objects.all()
-    context = {
-        'events': events
-    }
-    return render(request, 'event/events.html', context)
