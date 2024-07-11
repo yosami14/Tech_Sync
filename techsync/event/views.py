@@ -208,3 +208,82 @@ def organizerProfile(request, pk):
     return render(request, 'event/organizer_profile.html', context)
 
 
+from django.core.mail import send_mail
+from django.conf import settings
+
+from urllib.parse import urlencode, quote
+from urllib.parse import quote_plus
+from django.urls import reverse
+@login_required
+def registerForEvent(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    if request.method == 'POST':
+        if event.attendees.filter(id=request.user.id).exists():
+            messages.info(request, "You are already registered for this event.")
+        else:
+            # Get the additional fields from the form
+            full_name = request.POST.get('text')
+            email = request.POST.get('email')
+            send_email = request.POST.get('send_email')
+            google_calendar = request.POST.get('google_calendar')
+
+            # Add the user to the event attendees
+            event.attendees.add(request.user)
+            messages.success(request, "You have successfully registered for the event.")
+
+            # If the user checked the "Send Email" checkbox, send an email
+            if send_email:
+                # If the user checked the "Google Calendar" checkbox, generate a Google Calendar URL
+                if google_calendar:
+                    event_details = {
+                        'action': 'TEMPLATE',
+                        'text': event.title,
+                        'dates': f'{event.date.strftime("%Y%m%dT%H%M%S")}/{event.end_date.strftime("%Y%m%dT%H%M%S")}',
+                        'location': f'https://www.google.com/maps/search/?api=1&query={quote_plus(event.venue_name)}',
+                        'details': request.build_absolute_uri(reverse('event-detail', args=[event.pk])),
+                    }
+                    google_calendar_url = f'https://www.google.com/calendar/render?{urlencode(event_details)}'
+                    email_message = f"""
+                    Dear {full_name},
+
+                    Congratulations! You have successfully registered for the event: {event.title}.
+
+                    Event Details:
+                    Date: {event.date.strftime("%Y-%m-%d")}
+                    Time: {event.date.strftime("%H:%M")}
+                    Venue: {event.venue_name}
+
+                    Add this event to your Google Calendar: {google_calendar_url}
+
+                    We look forward to seeing you at the event.
+
+                    Best Regards,
+                    Your Event Team
+                    """
+                else:
+                    email_message = f"""
+                    Dear {full_name},
+
+                    Congratulations! You have successfully registered for the event: {event.title}.
+
+                    Event Details:
+                    Date: {event.date.strftime("%Y-%m-%d")}
+                    Time: {event.date.strftime("%H:%M")}
+                    Venue: {event.venue_name}
+
+                    We look forward to seeing you at the event.
+
+                    Best Regards,
+                    Your Event Team
+                    """
+
+                send_mail(
+                    'Event Registration',
+                    email_message,
+                    settings.EMAIL_HOST_USER,
+                    [email],
+                    fail_silently=False,
+                )
+
+        return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path
+    return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path

@@ -5,7 +5,6 @@
 <main class="singleProject my-md">
     <div class="container">
         <div class="layout">
-            
             <!-- Tags -->
             <div class="column column--1of3">
                 <h3 class="singleProject__subtitle">Date and Time</h3>
@@ -17,17 +16,17 @@
 
                 <h3 class="singleProject__subtitle">Location</h3>
                 <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue_name }}" target="_blank">
-                <div class="singleProject__toolStack">
-                    <span class="tag tag--pill tag--sub tag--lg">
-                        <small>
-                            Location: 
+                    <div class="singleProject__toolStack">
+                        <span class="tag tag--pill tag--sub tag--lg">
+                            <small>
+                                Location: 
                                 <i class="fas fa-map-marker-alt"></i> {{ event.venue_name }}
                             </small>
                         </span>
                         
                         <!-- Leaflet Map -->
                         <div id="leaflet-map" style="height: 400px; margin-top: 20px;"></div>
-                        
+
                         <!-- Transportation Icons -->
                         <span style="text-align: center; display: block; margin-top: 20px;"> How to get there </span>
                         <div style="margin-top: 20px; text-align: center;">
@@ -64,6 +63,11 @@
                     </span>
                     {% endfor %}
                 </div>
+
+<!-- Register Form Button -->
+<h3 class="singleProject__subtitle">Register</h3>
+<button type="button" class="btn btn--main" style="background-color:#F05537; color: white;" onclick="openRegistrationPopup()">Reserve a Spot</button>
+
             </div>
 
             <div class="column column--2of3">
@@ -80,29 +84,184 @@
     </div>
 </main>
 
+<!-- Custom Popup -->
+<div id="customPopup" class="custom-popup">
+    <div class="custom-popup-content">
+        <span class="close" onclick="closeRegistrationPopup()">&times;</span>
+        <h2>Register for Event</h2>
+        <main class="formPage my-xl">
+            <div class="content-box">
+                <div class="formWrapper">
+                    <a class="backButton" href="#"><i class="im im-angle-left"></i></a>
+                    <br>
+
+                    <form class="form" method="POST" action="{% url 'register-for-event' event.pk %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- Hidden Input: Username -->
+                        <input type="hidden" name="username" value="{{ user.username }}">
+
+                        <!-- Input: Full Name -->
+                        <div class="form__field">
+                            <label for="formInput#text">Full Name: </label>
+                            <input
+                                class="input input--text"
+                                id="formInput#text"
+                                type="text"
+                                name="text"
+                                placeholder="Enter your full name"
+                                value="{{ user.get_full_name }}"
+                            />
+                        </div>
+
+                        <!-- Input: Email -->
+                        <div class="form__field">
+                            <label for="formInput#email">Email: </label>
+                            <input
+                                class="input input--email"
+                                id="formInput#email"
+                                type="email"
+                                name="email"
+                                placeholder="e.g. user@domain.com"
+                                value="{{ user.email }}"
+                            />
+                        </div>
+
+                        <!-- Checkbox: Send Email -->
+                        <div class="form__field form__field--checkbox">
+                            <input
+                                class="input input--checkbox"
+                                id="formInput#checkbox-01"
+                                type="checkbox"
+                                name="send_email"
+                            />
+                            <label for="formInput#checkbox-01">Send Email</label>
+                        </div>
+
+                        <!-- Checkbox: Google Calendar -->
+                        <div class="form__field form__field--checkbox">
+                            <input
+                                class="input input--checkbox"
+                                id="formInput#checkbox-02"
+                                type="checkbox"
+                                name="google_calendar"
+                            />
+                            <label for="formInput#checkbox-02">Add to Google Calendar</label>
+                        </div>
+
+                        <!-- Input: Submit -->
+                        <div class="form__field form__field--action">
+                            <input class="btn btn--main" type="submit" value="Submit" />
+                        </div>
+                    </form>
+
+                    <p>Logged in as {{ user.email }}. <a href="{% url 'login' %}">Not you?</a></p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
 <!-- Include Leaflet CSS and JavaScript -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"></link>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const locationName = "{{ event.location }}";
-    const mapDiv = L.map('leaflet-map').setView([0, 0], 2); // Default view with zoom level 2
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapDiv);
-
-    const geocoder = new L.Control.Geocoder.Nominatim();
-    geocoder.geocode(locationName, function(results) {
-        const latlng = [results[0].center.lat, results[0].center.lng];
-        mapDiv.setView(latlng, 13); // Set map view to the location
-        const marker = L.marker(latlng).addTo(mapDiv);
-        marker.bindPopup(locationName).openPopup();
+    document.addEventListener('DOMContentLoaded', function() {
+        const locationName = "{{ event.location }}";
+        const mapDiv = L.map('leaflet-map').setView([0, 0], 2); // Default view with zoom level 2
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapDiv);
+    
+        const geocoder = new L.Control.Geocoder.Nominatim();
+        geocoder.geocode(locationName, function(results) {
+            const latlng = [results[0].center.lat, results[0].center.lng];
+            mapDiv.setView(latlng, 13); // Set map view to the location
+            const marker = L.marker(latlng).addTo(mapDiv);
+            marker.bindPopup(locationName).openPopup();
+        });
     });
-});
+
+function openRegistrationPopup() {
+    document.getElementById('customPopup').style.display = 'block';
+}
+
+function closeRegistrationPopup() {
+    document.getElementById('customPopup').style.display = 'none';
+}
 </script>
+
+<style>
+/* Styles for custom popup */
+.custom-popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000; /* Increase z-index to make the form appear over all layers */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.custom-popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px; /* Add border-radius to make the border rounded */
+}
+.custom-popup-content h2 {
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.custom-popup-content label {
+    margin-top: 10px;
+    display: block;
+}
+
+.custom-popup-content input[type="text"],
+.custom-popup-content input[type="email"],
+.custom-popup-content textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+.custom-popup-content button {
+    padding: 10px 20px;
+    background-color: #F05537;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.custom-popup-content button:hover {
+    background-color: #D44E2F;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
 
 {% endblock %}
 

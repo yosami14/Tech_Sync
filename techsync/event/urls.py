@@ -25,4 +25,7 @@ urlpatterns = [
     # event list
     path('', views.events, name='events'),
 
+    # register for event
+    path('register-for-event/<str:pk>', views.registerForEvent, name='register-for-event'),
+
 ]
