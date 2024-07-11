@@ -220,6 +220,8 @@ def registerForEvent(request, pk):
     if request.method == 'POST':
         if event.attendees.filter(id=request.user.id).exists():
             messages.info(request, "You are already registered for this event.")
+        elif event.attendees_limit <= 0:
+            messages.info(request, "This event is full.")
         else:
             # Get the additional fields from the form
             full_name = request.POST.get('text')
@@ -229,6 +231,8 @@ def registerForEvent(request, pk):
 
             # Add the user to the event attendees
             event.attendees.add(request.user)
+            event.attendees_limit -= 1  # Decrease the attendees limit
+            event.save()  # Save the updated event
             messages.success(request, "You have successfully registered for the event.")
 
             # If the user checked the "Send Email" checkbox, send an email

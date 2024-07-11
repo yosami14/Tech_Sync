@@ -67,6 +67,7 @@ class ProfileForm(ModelForm):
 
 
 from django import forms
+from django.forms import ModelForm, TextInput, Textarea, DateTimeInput, Select, SelectMultiple, NumberInput
 
 class EventForm(ModelForm):
     class Meta:
@@ -74,6 +75,7 @@ class EventForm(ModelForm):
         fields = [
             'title', 'description', 'date', 'end_date', 
             'category', 'event_image', 'speakers', 'location_type', 'location','venue_name', 'place', 
+            'attendees_limit',  # Add this line
         ]
         widgets = {
             'title': TextInput(attrs={'class': 'input', 'placeholder': 'Enter event title'}),
@@ -85,8 +87,11 @@ class EventForm(ModelForm):
             'venue_name': TextInput(attrs={'class': 'input', 'placeholder': 'Enter venue name'}),
             'place': TextInput(attrs={'class': 'input', 'placeholder': 'Enter place details (apartment, suite, etc.)'}),
             'category': SelectMultiple(attrs={'class': 'selectize-event-categories', 'placeholder': 'Add categories'}),
-            'speakers': SelectMultiple(attrs={'class': 'selectize-speakers', 'placeholder': 'Search Speakers username'})
+            'speakers': SelectMultiple(attrs={'class': 'selectize-speakers', 'placeholder': 'Search Speakers username'}),
+            'attendees_limit': NumberInput(attrs={'class': 'input', 'placeholder': 'Enter attendees limit'}),  # Add this line
         }
+
+    # Rest of your code...
 
     def clean(self):
         cleaned_data = super().clean()
@@ -102,6 +107,7 @@ class EventForm(ModelForm):
             cleaned_data['location'] = 'Online'
             cleaned_data['venue_name'] = ''
             cleaned_data['place'] = ''
+            cleaned_data['attendees_limit'] = ''
 
         if date and end_date:
             if end_date < date:

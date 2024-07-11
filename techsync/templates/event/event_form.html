@@ -37,12 +37,14 @@
         const locationInput = document.querySelector('input[name="location"]');
         const suggestionsContainer = document.getElementById('location-suggestions');
         const venueNameInput = document.querySelector('input[name="venue_name"]');
+        const attendeesLimitInput = document.querySelector('input[name="attendees_limit"]');  // Add this line
         let map;
 
         const locationTypeField = document.querySelector('select[name="location_type"]');
         const locationField = document.getElementById('field_location');
         const venueNameField = document.getElementById('field_venue_name');
         const placeField = document.getElementById('field_place');
+        const attendeesLimitField = document.getElementById('field_attendees_limit');  // Add this line
         const mapDiv = document.getElementById('map');
 
         function toggleVenueDetails() {
@@ -50,12 +52,14 @@
                 locationField.style.display = 'block';
                 venueNameField.style.display = 'block';
                 placeField.style.display = 'block';
+                attendeesLimitField.style.display = 'block';  // Add this line
                 mapDiv.style.display = 'block';
                 initMap();  // Initialize map if venue type is selected
             } else {
                 locationField.style.display = 'none';
                 venueNameField.style.display = 'none';
                 placeField.style.display = 'none';
+                attendeesLimitField.style.display = 'none';  // Add this line
                 mapDiv.style.display = 'none';
             }
         }
