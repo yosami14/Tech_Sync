@@ -30,16 +30,16 @@
                         <!-- Transportation Icons -->
                         <span style="text-align: center; display: block; margin-top: 20px;"> How to get there </span>
                         <div style="margin-top: 20px; text-align: center;">
-                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=driving" target="_blank" title="Car">
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.venue_name }}&travelmode=driving" target="_blank" title="Car">
                                 <i class="fas fa-car fa-2x"></i>
                             </a>
-                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=walking" target="_blank" title="Walking" style="margin-left: 20px;">
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.venue_name }}&travelmode=walking" target="_blank" title="Walking" style="margin-left: 20px;">
                                 <i class="fas fa-walking fa-2x"></i>
                             </a>
-                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=transit" target="_blank" title="Bus" style="margin-left: 20px;">
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.venue_name }}&travelmode=transit" target="_blank" title="Bus" style="margin-left: 20px;">
                                 <i class="fas fa-bus fa-2x"></i>
                             </a>
-                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.location }}&travelmode=bicycling" target="_blank" title="Cycle" style="margin-left: 20px;">
+                            <a href="https://www.google.com/maps/dir/?api=1&origin=&destination={{ event.venue_name }}&travelmode=bicycling" target="_blank" title="Cycle" style="margin-left: 20px;">
                                 <i class="fas fa-bicycle fa-2x"></i>
                             </a>
                         </div>
@@ -65,10 +65,14 @@
                 </div>
 
                 <h3 class="singleProject__subtitle">Register</h3>
-                {% if user in event.attendees.all %}
-                    <button class="btn btn-primary" style="color: white; background-color:grey;">Registered</button>
+                {% if not user.is_event_organizer and not user.is_event_moderator%}
+                    {% if user in event.attendees.all %}
+                        <button class="btn btn-primary" style="color: white; background-color:grey;">Registered</button>
+                    {% else %}
+                        <button type="button" class="btn btn--main" style="background-color:#F05537; color: white;" onclick="openRegistrationPopup()">Reserve a Spot</button>
+                    {% endif %}
                 {% else %}
-                    <button type="button" class="btn btn--main" style="background-color:#F05537; color: white;" onclick="openRegistrationPopup()">Reserve a Spot</button>
+                    <button class="btn btn-primary" style="color: white; background-color:grey;" disabled>Only Users can Register</button>
                 {% endif %}
             </div>
 

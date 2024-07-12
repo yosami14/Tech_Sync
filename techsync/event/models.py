@@ -53,7 +53,7 @@ class Event(models.Model):
     category = models.ManyToManyField(EventCategory, blank=True)
     event_image = models.ImageField(upload_to='events', default='default_event.png')
     attendees = models.ManyToManyField(User, blank=True, related_name='attending_events')
-    attendees_limit = models.PositiveIntegerField(default=0)
+    attendees_limit = models.PositiveIntegerField(default=10)
     speakers = models.ManyToManyField(Profile, blank=True, related_name='speaking_events')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -75,6 +75,7 @@
                                 <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
                                 <li class="header__menuItem"><a  href="{% url 'projects' %}">Projects</a></li>
                                 <li class="header__menuItem"><a  href="{% url 'home-group'%}">Group</a></li>
+                                <li class="header__menuItem"><a href="{% url 'events' %}">Events</a></li>
                                 {% if request.user.is_authenticated %}
                                 {% comment %} <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li>  {% endcomment %}
                                 <li class="header__menuItem"><a  href="{% url 'user-chatrooms' %}">Inbox</a></li> 
