@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ profile.name }}'s CV</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { font-size: 28px; text-align: center; }
+        h2 { font-size: 24px; margin-top: 20px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        h3 { font-size: 20px; margin-top: 15px; }
+        .profile-image { width: 100px; height: auto; display: block; margin: 0 auto; }
+        .contact-info { margin: 10px 0; font-size: 16px; text-align: center; }
+        .summary { margin: 20px 0; font-size: 16px; }
+        .skills { font-size: 16px; }
+        .projects { margin-top: 10px; font-size: 16px; }
+        .project { margin: 5px 0; }
+        a { color: #1E90FF; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>{{ profile.name }}</h1>
+    <img src="{{ profile.profile_image.url }}" alt="{{ profile.name }}" class="profile-image" onerror="this.style.display='none';"/>
+    
+    <div class="contact-info">
+        <h4>{{ profile.phone_number }} | {{ profile.user.email }} | {{ profile.location }}</h4>
+    </div>
+
+    <div class="summary">
+        <h3>Summary</h3>
+        <p>{{ profile.about }}</p>
+    </div>
+
+    <h2>Skills</h2>
+    <p class="skills">
+        {% for skill in skills %}
+            {{ skill.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+
+    <h2>Projects</h2>
+    <div class="projects">
+        {% for project in projects %}
+            <div class="project">
+                <a href="{{ project.source_link }}" target="_blank">{{ project.title }}</a>: 
+                {% for tag in project.tags.all %}
+                    <span class="tag tag--pill tag--sub tag--lg">
+                       {{ tag.name }} |
+                    </span>
+                {% endfor %}
+                <br>
+                {{ project.description|truncatechars:400 }}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

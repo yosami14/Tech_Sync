@@ -41,8 +41,17 @@
                     </a>
                   </li>
                 {% endif %}
+                <li>
+                  <a href="{% url 'download-cv' %}" class="btn btn--sub btn--sm">
+                    
+                      <i class="fas fa-download"></i> CV
+                  </a>
+                </li>
+              
               </ul>
-              <a href="#" class="btn btn--sub btn--lg">Send Message </a>
+              {% if profile.user != user %}
+              <a href="{% url 'start-chat' profile.user.username %}" class="btn btn--sub btn--lg">Send Message </a>
+            {% endif %}
             </div>
           </div>
         </div>

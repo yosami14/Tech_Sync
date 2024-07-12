@@ -117,6 +117,46 @@ def userAccount(request):
     }
     return render(request, 'users/account.html', context)
 
+
+#cv creator
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from .models import Profile
+
+@login_required(login_url='login')
+def download_cv(request):
+    profile = request.user.profile
+    skills = profile.skill_set.all()
+    projects = profile.project_set.all()
+
+    context = {
+        'profile': profile,
+        'skills': skills,
+        'projects': projects,
+    }
+    
+    # Render the HTML template
+    html = render_to_string('users/cv_template.html', context)
+    
+    # Create PDF response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="cv.pdf"'
+    
+    # Generate PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    
+    if pisa_status.err:
+        return HttpResponse('Error generating PDF', status=500)
+
+    return response
+
+
+
+
+
+
 #Edit User Account
 @login_required(login_url='login')
 def editAccount(request):

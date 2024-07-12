@@ -41,8 +41,11 @@ class ProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-                field.widget.attrs.update({'class': 'input'})
-
+            field.widget.attrs.update({'class': 'input'})
+            if name == 'phone_number':
+                field.widget.attrs.update({
+                    'placeholder': "Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+                })
 
 
 
