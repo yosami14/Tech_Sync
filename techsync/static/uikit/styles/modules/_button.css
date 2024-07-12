@@ -50,7 +50,7 @@
 
 .btn--sub {
   background-color: var(--color-sub);
-  color: var(--color-white);
+  color: var(--color-btn-text);
 }
 
 .btn.btn--sub--outline {

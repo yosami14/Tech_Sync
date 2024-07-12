@@ -13,28 +13,43 @@
               <p class="dev__title">{{profile.contact_phone}} | {{profile.contact_email}}</p>
               <p class="dev__location">Based in {{profile.address}}</p>
               <ul class="dev__social">
-                  {% if profile.github_link %}
+                {% if profile.website %}
                   <li>
-                    <a title="Github" href="{{ profile.website }}" target="_blank"><i class="im im-github"></i></a>
+                    <a title="Website" href="{{ profile.website }}" target="_blank" class="website">
+                      <i class="fas fa-globe"></i>
+                    </a>
+                  </li>
+                {% endif %}
+                {% if profile.facebook_link %}
+                  <li>
+                    <a title="Facebook" href="{{ profile.facebook_link }}" target="_blank" class="facebook">
+                      <i class="fab fa-facebook"></i>
+                    </a>
                   </li>
                 {% endif %}
                 {% if profile.twitter_link %}
                   <li>
-                    <a title="Twitter" href="{{ profile.twitter_link }}" target="_blank"><i class="im im-twitter"></i></a>
+                    <a title="Twitter" href="{{ profile.twitter_link }}" target="_blank" class="twitter">
+                      <i class="fab fa-twitter"></i>
+                    </a>
                   </li>
                 {% endif %}
                 {% if profile.linkedin_link %}
                   <li>
-                    <a title="LinkedIn" href="{{ profile.linkedin_link }}" target="_blank"><i class="im im-linkedin"></i></a>
+                    <a title="LinkedIn" href="{{ profile.linkedin_link }}" target="_blank" class="linkedin">
+                      <i class="fab fa-linkedin"></i>
+                    </a>
                   </li>
                 {% endif %}
-                {% if profile.personal_link %}
+                {% comment %} {% if profile.more_link %}
                   <li>
-                    <a title="Personal Website" href="{{ profile.facebook_link }}" target="_blank"><i class="im im-globe"></i></a>
+                    <a title="More" href="{{ profile.more_link }}" target="_blank" class="more">
+                      <i class="fas fa-globe"></i>
+                    </a>
                   </li>
-                {% endif %}
+                {% endif %} {% endcomment %}
               </ul>
-              <a href="#" class="btn btn--sub btn--lg">Send Message </a>
+              {% comment %} <a href="#" class="btn btn--sub btn--lg">Send Message </a> {% endcomment %}
             </div>
           </div>
         </div>
@@ -102,5 +117,59 @@
     </div>
   </div>
   </main>
+  <style>
+    .dev__social {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .dev__social li {
+      display: inline-block;
+    }
+
+    .dev__social a {
+      text-decoration: none;
+
+      font-size: 18px;
+      transition: color 0.3s ease;
+      width: 40px; /* Set desired width */
+      height: 40px; /* Set desired height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dev__social a:hover {
+      color: #007bff; /* Default hover color if specific one is not set */
+    }
+
+    .dev__social a i {
+      margin-right: 0; /* Remove right margin to center the icon */
+      font-size: 24px;
+    }
+
+    .dev__social a.website:hover {
+      color: #ff4500; /* Personal website hover color, change as needed */
+    }
+
+    .dev__social a.facebook:hover {
+      color: #3b5998; /* Facebook hover color */
+    }
+
+    .dev__social a.twitter:hover {
+      color: #1da1f2; /* Twitter hover color */
+    }
+
+    .dev__social a.linkedin:hover {
+      color: #0077b5; /* LinkedIn hover color */
+    }
+
+    .dev__social a.more:hover {
+      color: #ff4500; /* More link hover color, change as needed */
+    }
+  </style>
   {% endblock content %}
   

@@ -1,17 +1,17 @@
 :root {
   --color-main: #5aa5b9;
-  --color-main-light: #e6faff;
+  --color-main-light: #e6faff; /*btn bg*/
   --color-sub: #0b0c10;
   /* --color-sub: #3f4156; */
   --color-sub-light: #51546e;
-  --color-sub-lighter: #ededfd;
+  --color-sub-lighter: #ededfd;/* another btn bg*/
   --color-text: #737373;
   --color-gray: #8b8b8b;
-  --color-light: #e5e7eb;
+  --color-light: #e5e7eb; /*card border color*/
   --color-light-gray: #767676;
-  --color-bg: #f8fafd;
-  --color-white: #fffefd;
-  --color-white-light: #f3f3f3;
+  --color-bg: #f8fafd;/* page bg*/
+  --color-white: #fffefd;/* card bg*/
+  --color-white-light: #f3f3f3; /* br line*/
   --color-success: #359e64;
   --color-success-bg: #def8e8;
   --color-error: #fc4b0b;
@@ -23,4 +23,6 @@
   --font-bold: 700;
   --generic-shadow: 1px 1px 5px #00000010;
   --generic-transition: all 0.3s ease-in-out;
+
+  --color-btn-text: #0b0c10;
 }
