@@ -50,6 +50,17 @@
         {% if registrations|length > 10 %}
             <button id="showMoreBtn" onclick="showMore()">Show More</button>
         {% endif %}
+
+                <!-- Chart.js Canvas -->
+                <div class="container-analysis">
+                    <h1>{{ event.title }}</h1>
+                
+                    <!-- Chart Container -->
+                    <div>
+                        <canvas id="attendanceChart"></canvas>
+                        <canvas id="registrationChart"></canvas>
+                    </div>
+                </div>
     </div>
 
     <!-- Modal for image expansion -->
@@ -59,7 +70,106 @@
         <div id="caption"></div>
     </div>
 
+    <!-- Chart.js Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
     <script>
+        const eventDates = {{ event_dates|safe }};
+        const labels = eventDates.map(date => date.date);  // Access 'date' instead of 'registration_date__date'
+        const counts = eventDates.map(date => date.count);  // Access 'count'
+    
+        const ctx = document.getElementById('attendanceChart').getContext('2d');
+        const attendanceChart = new Chart(ctx, {
+            type: 'line', // Change to 'bar' for a bar chart
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Attendees',
+                    data: counts,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('registrationChart').getContext('2d');
+    
+            const eventDates = {{ event_dates|safe }};
+            const labels = eventDates.map(item => item.date);
+            const data = eventDates.map(item => item.count);
+            const eventLimit = {{ event.attendees_limit }};
+            const registrationsCount = {{ attendee_count }};
+            const remainingSlots = eventLimit - registrationsCount;
+    
+            const chartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Number of Attendees',
+                        data: data,
+                        backgroundColor: '#36A2EB',
+                    },
+                    {
+                        label: 'Remaining Slots',
+                        data: new Array(labels.length).fill(remainingSlots),
+                        backgroundColor: '#FF6384',
+                    }
+                ]
+            };
+    
+            const config = {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number of Attendees'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                                }
+                            }
+                        }
+                    }
+                },
+            };
+    
+            new Chart(ctx, config);
+        });
+    </script>
+    
+    
+    <script>
+
         let shownCount = 10;
 
         function searchTable() {
@@ -219,6 +329,26 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
+        }
+    </style>
+
+    <style>
+        .container-analysis {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+        }
+    
+        h1 {
+            text-align: center;
+        }
+    
+        canvas {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 {% endblock content %}

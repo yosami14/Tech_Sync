@@ -350,13 +350,44 @@ def scanQrCode(request):
 
 
 
+from django.db.models import Count
+from django.utils import timezone
+
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Count
+from .models import Event, EventRegistration
+
 def event_analytics(request, pk):
     event = get_object_or_404(Event, pk=pk)
     registrations = EventRegistration.objects.filter(event=event)
 
+    attendee_count = registrations.count()
+    
+    # Prepare data for Chart.js with formatted date
+    event_dates = (
+        EventRegistration.objects
+        .filter(event=event)
+        .values('registration_date__date')
+        .annotate(count=Count('id'))
+        .order_by('registration_date__date')
+    )
+
+    # Convert to a list of dictionaries for JSON serialization
+    event_dates_list = [
+        {
+            'date': date['registration_date__date'].strftime('%Y-%m-%d'),  # Format the date
+            'count': date['count']
+        }
+        for date in event_dates
+    ]
+
     context = {
         'event': event,
         'registrations': registrations,
+        'attendee_count': attendee_count,
+        'event_dates': event_dates_list,  # Pass the formatted data to the template
     }
 
     return render(request, 'event/event_analytics.html', context)
+
+
