@@ -186,3 +186,44 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 #         ),
 #     },
 # }
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "TechSync Admin",
+    "site_header": "TechSync",
+    "site_brand": "TechSync",
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo s.png",
+    
+    # Welcome text on the login screen
+    "welcome_sign": "Admin login",
+        # Copyright on the footer
+    "copyright": "TechSync",
+    # Links to put along the top menu
+    "topmenu_links": [
+        {"app": "group"},
+        {"app": "a_rtchat"},
+        {"app": "event"},
+        {"app": "projects"},
+        {"app": "users"},
+    ],
+    
+    # Hide these apps when generating side menu e.g (auth)
+    "hide_apps": ["auth"],
+
+    # Hide these models when generating side menu (e.g auth.user)
+    "hide_models": [],
+
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "app_name.ChatGroup": "fas fa-comments",
+        "app_name.GroupMessage": "fas fa-comment-dots",
+    },
+
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",
+}
