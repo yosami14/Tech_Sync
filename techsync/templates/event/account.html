@@ -80,8 +80,9 @@
                 </p>
               </td>
               <td class="settings__tableActions">
-                 <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-event' event.pk %}"><i class="im im-edit"></i> Edit</a>
-                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-event' event.pk %}?next=/organization-account"><i class="im im-x-mark-circle-o"></i>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-event' event.pk %}"> <i class="fas fa-pencil-alt"></i> Edit</a>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'event-analytics' event.pk %}"> <i class="fas fa-info-circle"></i> More</a>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-event' event.pk %}?next=/organization-account"> <i class="fas fa-trash-alt"></i> Delete</a>
                   Delete</a> 
               </td>
             </tr>

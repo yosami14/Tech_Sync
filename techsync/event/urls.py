@@ -28,4 +28,7 @@ urlpatterns = [
     # register for event
     path('register-for-event/<str:pk>', views.registerForEvent, name='register-for-event'),
 
+    # analytics for event
+    path('analytics/<str:pk>', views.event_analytics, name='event-analytics'),
+
 ]

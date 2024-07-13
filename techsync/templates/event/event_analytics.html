@@ -1,0 +1,227 @@
+{% extends "main/main.html" %}
+
+{% block content %}
+    <div class="container-analysis">
+        <h1>{{ event.title }}</h1>
+
+        <h2>Attendees:</h2>
+
+        <!-- Search Bar -->
+        <div class="form__field">
+            <label for="searchInput">Search Attendees:</label>
+            <input
+                class="input input--text"
+                id="searchInput"
+                type="text"
+                placeholder="Type to search..."
+                onkeyup="searchTable()"
+            />
+        </div>
+
+        <!-- Table -->
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Joined At</th>
+                    <th>Headline</th>
+                    <th>Location</th>
+                    <th>Profile Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                    <tr class="attendee-row">
+                        <td><a href="{% url 'user-profile' registration.attendee.profile.id %}">{{ registration.attendee.profile.name }}</a></td>
+                        <td><a href="mailto:{{ registration.attendee.email }}">{{ registration.attendee.email }}</a></td>
+                        <td>{{ registration.registration_date }}</td>
+                        <td>{{ registration.attendee.profile.headline }}</td>
+                        <td>{{ registration.attendee.profile.location }}</td>
+                        <td>
+                            <img src="{{ registration.attendee.profile.profile_image.url }}" alt="Profile Image" class="profile-image" onclick="openModal('{{ registration.attendee.profile.profile_image.url }}')"/>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No attendees yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if registrations|length > 10 %}
+            <button id="showMoreBtn" onclick="showMore()">Show More</button>
+        {% endif %}
+    </div>
+
+    <!-- Modal for image expansion -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="expandedImg" />
+        <div id="caption"></div>
+    </div>
+
+    <script>
+        let shownCount = 10;
+
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('dataTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j]) {
+                        const cellValue = cells[j].textContent || cells[j].innerText;
+                        if (cellValue.toLowerCase().indexOf(filter) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        }
+
+        function showMore() {
+            const rows = document.querySelectorAll('#dataTable tbody tr.attendee-row');
+            for (let i = shownCount; i < shownCount + 10 && i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+            shownCount += 10;
+
+            // Hide the button if no more rows to show
+            if (shownCount >= rows.length) {
+                document.getElementById('showMoreBtn').style.display = 'none';
+            }
+        }
+
+        // Initially hide rows after the first 10
+        const rows = document.querySelectorAll('#dataTable tbody tr.attendee-row');
+        for (let i = 10; i < rows.length; i++) {
+            rows[i].style.display = 'none';
+        }
+
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const expandedImg = document.getElementById('expandedImg');
+            expandedImg.src = src;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+    </script>
+
+    <style>
+        .container-analysis {
+            max-width: 1200px; /* Adjust width as needed */
+            margin: 0 auto; /* Center container */
+            padding: 20px; /* Space around content */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff; /* Background color */
+            border-radius: 8px; /* Rounded corners */
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .form__field {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%; /* Full width */
+            max-width: 300px; /* Limit max width */
+            margin: 0 auto; /* Center the input */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .attendee-row:hover {
+            background-color: #e0e0e0; /* Hover effect */
+        }
+
+        .profile-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* Circular image */
+            cursor: pointer; /* Pointer on hover */
+        }
+
+        #showMoreBtn {
+            display: block;
+            margin: 20px auto; /* Center button */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        #showMoreBtn:hover {
+            background-color: #0056b3; /* Darker on hover */
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%; /* Width of the image */
+            max-width: 700px; /* Max width */
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+{% endblock content %}

@@ -214,11 +214,14 @@ from django.conf import settings
 from urllib.parse import urlencode, quote
 from urllib.parse import quote_plus
 from django.urls import reverse
+from django.utils import timezone
+from .models import EventRegistration
+
 @login_required
 def registerForEvent(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
-        if event.attendees.filter(id=request.user.id).exists():
+        if EventRegistration.objects.filter(event=event, attendee=request.user).exists():
             messages.info(request, "You are already registered for this event.")
         elif event.attendees_limit <= 0:
             messages.info(request, "This event is full.")
@@ -229,8 +232,8 @@ def registerForEvent(request, pk):
             send_email = request.POST.get('send_email')
             google_calendar = request.POST.get('google_calendar')
 
-            # Add the user to the event attendees
-            event.attendees.add(request.user)
+            # Create an EventRegistration instance
+            EventRegistration.objects.create(event=event, attendee=request.user, registration_date=timezone.now())
             event.attendees_limit -= 1  # Decrease the attendees limit
             event.save()  # Save the updated event
             messages.success(request, "You have successfully registered for the event.")
@@ -291,3 +294,16 @@ def registerForEvent(request, pk):
 
         return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path
     return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path
+
+
+
+def event_analytics(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    registrations = EventRegistration.objects.filter(event=event)
+
+    context = {
+        'event': event,
+        'registrations': registrations,
+    }
+
+    return render(request, 'event/event_analytics.html', context)

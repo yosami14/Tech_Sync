@@ -52,7 +52,8 @@ class Event(models.Model):
     organizer = models.ForeignKey(EventOrganizer, on_delete=models.CASCADE)
     category = models.ManyToManyField(EventCategory, blank=True)
     event_image = models.ImageField(upload_to='events', default='default_event.png')
-    attendees = models.ManyToManyField(User, blank=True, related_name='attending_events')
+    #attendees = models.ManyToManyField(User, blank=True, related_name='attending_events')
+    attendees = models.ManyToManyField(User, through='EventRegistration', related_name='attending_events')
     attendees_limit = models.PositiveIntegerField(default=10)
     speakers = models.ManyToManyField(Profile, blank=True, related_name='speaking_events')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -71,3 +72,17 @@ class Event(models.Model):
             self.location = 'Online'
             self.venue_name = ''
             self.place = ''
+
+
+
+class EventRegistration(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    attendee = models.ForeignKey(User, on_delete=models.CASCADE)
+    registration_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('event', 'attendee')
+
+    def __str__(self):
+        return f'{self.event.title} - {self.attendee.username}'
