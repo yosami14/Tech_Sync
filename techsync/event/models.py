@@ -79,6 +79,7 @@ class EventRegistration(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     attendee = models.ForeignKey(User, on_delete=models.CASCADE)
+    has_attended = models.BooleanField(default=False)
     registration_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:

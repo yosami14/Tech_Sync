@@ -30,5 +30,6 @@ urlpatterns = [
 
     # analytics for event
     path('analytics/<str:pk>', views.event_analytics, name='event-analytics'),
+    path('scan-qr-code/', views.scanQrCode, name='scan-qr-code'),
 
 ]

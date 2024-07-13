@@ -217,6 +217,13 @@ from django.urls import reverse
 from django.utils import timezone
 from .models import EventRegistration
 
+import qrcode
+from django.core.files.base import ContentFile
+from django.core.mail import EmailMessage
+from django.utils import timezone
+from io import BytesIO
+from urllib.parse import urlencode, quote_plus
+
 @login_required
 def registerForEvent(request, pk):
     event = get_object_or_404(Event, pk=pk)
@@ -226,74 +233,120 @@ def registerForEvent(request, pk):
         elif event.attendees_limit <= 0:
             messages.info(request, "This event is full.")
         else:
-            # Get the additional fields from the form
+            # Get additional fields from the form
             full_name = request.POST.get('text')
             email = request.POST.get('email')
             send_email = request.POST.get('send_email')
             google_calendar = request.POST.get('google_calendar')
 
             # Create an EventRegistration instance
-            EventRegistration.objects.create(event=event, attendee=request.user, registration_date=timezone.now())
-            event.attendees_limit -= 1  # Decrease the attendees limit
-            event.save()  # Save the updated event
+            registration = EventRegistration.objects.create(event=event, attendee=request.user, registration_date=timezone.now())
+            event.attendees_limit -= 1
+            event.save()
             messages.success(request, "You have successfully registered for the event.")
 
-            # If the user checked the "Send Email" checkbox, send an email
+            # Generate QR code with EventRegistration data
+            qr_data = f"Event: {event.title}\nAttendee: {registration.attendee.username}\nRegistration ID: {registration.id}"
+            qr_image = qrcode.make(qr_data)
+            qr_buffer = BytesIO()
+            qr_image.save(qr_buffer, format='PNG')
+            qr_image_file = ContentFile(qr_buffer.getvalue(), 'event_qr_code.png')
+
+            # Google Calendar link
+            if google_calendar:
+                event_details = {
+                    'action': 'TEMPLATE',
+                    'text': event.title,
+                    'dates': f'{event.date.strftime("%Y%m%dT%H%M%S")}/{event.end_date.strftime("%Y%m%dT%H%M%S")}',
+                    'location': f'https://www.google.com/maps/search/?api=1&query={quote_plus(event.venue_name)}',
+                    'details': request.build_absolute_uri(reverse('event-detail', args=[event.pk])),
+                }
+                google_calendar_url = f'https://www.google.com/calendar/render?{urlencode(event_details)}'
+                calendar_message = f"Add this event to your Google Calendar: {google_calendar_url}\n\n"
+            else:
+                calendar_message = ""
+
+            # Email setup
+            email_message = f"""
+            Dear {full_name},
+
+            Congratulations! You have successfully registered for the event: {event.title}.
+
+            Event Details:
+            Date: {event.date.strftime("%Y-%m-%d")}
+            Time: {event.date.strftime("%H:%M")}
+            Venue: {event.venue_name}
+
+            {calendar_message}
+            Here is your QR code for event entry:
+            """
+            email = EmailMessage(
+                subject='Event Registration',
+                body=email_message,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email],
+            )
+            email.attach('event_qr_code.png', qr_image_file.read(), 'image/png')
+
             if send_email:
-                # If the user checked the "Google Calendar" checkbox, generate a Google Calendar URL
-                if google_calendar:
-                    event_details = {
-                        'action': 'TEMPLATE',
-                        'text': event.title,
-                        'dates': f'{event.date.strftime("%Y%m%dT%H%M%S")}/{event.end_date.strftime("%Y%m%dT%H%M%S")}',
-                        'location': f'https://www.google.com/maps/search/?api=1&query={quote_plus(event.venue_name)}',
-                        'details': request.build_absolute_uri(reverse('event-detail', args=[event.pk])),
-                    }
-                    google_calendar_url = f'https://www.google.com/calendar/render?{urlencode(event_details)}'
-                    email_message = f"""
-                    Dear {full_name},
+                email.send(fail_silently=False)
 
-                    Congratulations! You have successfully registered for the event: {event.title}.
+        return redirect('event-detail', pk=event.pk)
+    return redirect('event-detail', pk=event.pk)
 
-                    Event Details:
-                    Date: {event.date.strftime("%Y-%m-%d")}
-                    Time: {event.date.strftime("%H:%M")}
-                    Venue: {event.venue_name}
 
-                    Add this event to your Google Calendar: {google_calendar_url}
 
-                    We look forward to seeing you at the event.
 
-                    Best Regards,
-                    Your Event Team
-                    """
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import EventRegistration
+
+def scanQrCode(request):
+    context = {}
+    scanned_data = None
+
+    if request.method == 'POST':
+        qr_data = request.POST.get('qr_data')
+
+        if qr_data:
+            scanned_data = qr_data
+            try:
+                # Extract the registration ID from the QR code data
+                registration_id = qr_data.split('Registration ID: ')[1].strip()
+
+                # Check if the registration exists
+                registration = EventRegistration.objects.get(id=registration_id)
+                attendee = registration.attendee  # Get the associated attendee
+
+                # Add attendee details to context
+                context['attendee'] = {
+                    'username': attendee.username,
+                    'full_name': attendee.profile.name,
+                    'email': attendee.email,
+                    'profile_picture': attendee.profile.profile_image.url if attendee.profile.profile_image else None,
+                    'registration_date': registration.registration_date,
+                    'has_attended': registration.has_attended,
+                }
+
+                if not registration.has_attended:
+                    # Mark as attended
+                    registration.has_attended = True
+                    registration.save()
+                    messages.success(request, "Attendance marked successfully.")
+                    context['attendance_status'] = "Success Valid ID Registration ID: {}".format(registration_id)
                 else:
-                    email_message = f"""
-                    Dear {full_name},
+                    messages.info(request, "You have already marked attendance for this registration.")
+                    context['attendance_status'] = "ID already marked for Registration ID: {}".format(registration_id)
 
-                    Congratulations! You have successfully registered for the event: {event.title}.
+            except (EventRegistration.DoesNotExist, IndexError):
+                messages.error(request, "Invalid QR code or registration not found.")
+                context['attendance_status'] = "Invalid QR code or registration not found."
 
-                    Event Details:
-                    Date: {event.date.strftime("%Y-%m-%d")}
-                    Time: {event.date.strftime("%H:%M")}
-                    Venue: {event.venue_name}
+    context['scanned_data'] = scanned_data
 
-                    We look forward to seeing you at the event.
+    return render(request, 'event/verify_attendee.html', context)
 
-                    Best Regards,
-                    Your Event Team
-                    """
-
-                send_mail(
-                    'Event Registration',
-                    email_message,
-                    settings.EMAIL_HOST_USER,
-                    [email],
-                    fail_silently=False,
-                )
-
-        return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path
-    return redirect('event-detail', pk=event.pk)  # Adjust to your event detail URL name or path
 
 
 
