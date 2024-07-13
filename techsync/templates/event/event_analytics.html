@@ -4,7 +4,6 @@
     <div class="container-analysis">
         <h1>{{ event.title }}</h1>
 
-        <h2>Attendees:</h2>
 
         <!-- Search Bar -->
         <div class="form__field">
@@ -24,8 +23,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Joined At</th>
-                    <th>Headline</th>
+                    <th>Registered At</th>
                     <th>Location</th>
                     <th>Profile Image</th>
                 </tr>
@@ -36,7 +34,6 @@
                         <td><a href="{% url 'user-profile' registration.attendee.profile.id %}">{{ registration.attendee.profile.name }}</a></td>
                         <td><a href="mailto:{{ registration.attendee.email }}">{{ registration.attendee.email }}</a></td>
                         <td>{{ registration.registration_date }}</td>
-                        <td>{{ registration.attendee.profile.headline }}</td>
                         <td>{{ registration.attendee.profile.location }}</td>
                         <td>
                             <img src="{{ registration.attendee.profile.profile_image.url }}" alt="Profile Image" class="profile-image" onclick="openModal('{{ registration.attendee.profile.profile_image.url }}')"/>
