@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from django.contrib.auth import views as auth_views
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +31,8 @@ urlpatterns = [
     path('event/',include('event.urls')),
     path('',include('users.urls')),
 
+    path('admin-charts/', views.admin_dashboard, name='admin-charts'),
+    
 
     path('ckeditor/', include('ckeditor_uploader.urls')),
 
@@ -44,6 +47,9 @@ urlpatterns = [
 
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="main/reset_password_complete.html"),
          name="password_reset_complete"),
+
+    #ADMIN CHARTS
+    path('admin_tools_stats/', include('admin_tools_stats.urls')),
 ]
 
 if settings.DEBUG:

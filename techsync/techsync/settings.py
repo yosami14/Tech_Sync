@@ -33,8 +33,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #channel
     'daphne',
-    #Jazzmin
+    
+    #ADMIN CHARTS
+    'admin_tools_stats',
+    'django_nvd3',
+    
     'jazzmin',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -206,6 +211,7 @@ JAZZMIN_SETTINGS = {
         {"app": "event"},
         {"app": "projects"},
         {"app": "users"},
+        {"name": "Analytics", "url": "/admin-charts"},  # new link
     ],
     
     # Hide these apps when generating side menu e.g (auth)
@@ -222,8 +228,12 @@ JAZZMIN_SETTINGS = {
         "app_name.GroupMessage": "fas fa-comment-dots",
     },
 
+    #hide side menu and some apps
+    # "hide_apps": ["auth", "group", "a_rtchat", "event", "projects", "users","admin_tools_stats"],
+    "hide_apps": ["auth", "group", "a_rtchat"],
+    "show_sidebar": False,
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "darkly",
+    "theme": "simplex",
 }

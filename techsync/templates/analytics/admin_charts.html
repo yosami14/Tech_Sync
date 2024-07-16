@@ -1,0 +1,310 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static jazzmin %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block content_title %} {% trans 'Dashboard' %} {% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item">Analytics</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <h1>Admin Dashboard</h1>
+
+    <div class="container mt-4">
+        <!-- Date Filter Form -->
+        <form method="GET" action="">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date }}">
+                </div>
+                <div class="col-md-4 align-self-end">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Projects Over Time and Most Used Tags -->
+        <h1>Projects</h1>
+        <div class="row">
+            <!-- Projects Over Time Chart -->
+            <div class="col-md-6">
+                <h3>Projects Over Time</h3>
+                <canvas id="projectsOverTimeChart"></canvas>
+            </div>
+
+            <!-- Most Used Tags Chart -->
+            <div class="col-md-6">
+                <h3>Most Used Tags</h3>
+                <canvas id="mostUsedTagsChart"></canvas>
+            </div>
+
+            <!-- Top 5 Most Voted Projects with Vote Ratios -->
+            <div class="col-md-12">
+                <h3>Top 5 Most Voted Projects</h3>
+                <canvas id="topVotedProjectsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Events Over Time and Most Used Categories -->
+        <h1>Events</h1>
+        <div class="row">
+            <!-- Events Over Time Chart -->
+            <div class="col-md-6">
+                <h3>Events Over Time</h3>
+                <canvas id="eventsOverTimeChart"></canvas>
+            </div>
+
+            <!-- Most Used Categories Chart -->
+            <div class="col-md-6">
+                <h3>Most Used Categories</h3>
+                <canvas id="mostUsedCategoriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Rooms chart -->
+        <h1>Rooms</h1>
+        <div class="row">
+            <!-- Top 5 Most Messages in a Room -->
+            <div class="col-md-12">
+                <h3>Most active room</h3>
+                <canvas id="topMessagesChart"></canvas>
+            </div>
+
+            <!-- Rooms Over Time Chart -->
+            <div class="col-md-6">
+                <h3>Rooms Over Time</h3>
+                <canvas id="roomsOverTimeChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data for Projects Over Time
+        const projectsOverTime = {{ projects_over_time|safe }};
+        const projectLabels = projectsOverTime.map(p => p.project_date); // Correctly mapped
+        const projectCounts = projectsOverTime.map(p => p.count);
+        
+        const projectsCtx = document.getElementById('projectsOverTimeChart').getContext('2d');
+        new Chart(projectsCtx, {
+            type: 'line',
+            data: {
+                labels: projectLabels,
+                datasets: [{
+                    label: 'New Projects',
+                    data: projectCounts,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Data for Most Used Tags
+        const mostUsedTags = {{ most_used_tags|safe }};
+        const tagLabels = mostUsedTags.map(t => t.name);
+        const tagCounts = mostUsedTags.map(t => t.project_count);
+
+        const tagsCtx = document.getElementById('mostUsedTagsChart').getContext('2d');
+        new Chart(tagsCtx, {
+            type: 'bar',
+            data: {
+                labels: tagLabels,
+                datasets: [{
+                    label: 'Number of Projects',
+                    data: tagCounts,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Data for Top 5 Most Voted Projects with Vote Ratios
+        const topVotedProjects = {{ top_voted_projects|safe }};
+        const topVotedLabels = topVotedProjects.map(p => p.title);
+        const topVotedCounts = topVotedProjects.map(p => p.total_votes);
+        const topVotedRatios = topVotedProjects.map(p => p.calculated_vote_ratio);
+
+        const topVotedCtx = document.getElementById('topVotedProjectsChart').getContext('2d');
+        new Chart(topVotedCtx, {
+            type: 'bar',
+            data: {
+                labels: topVotedLabels,
+                datasets: [{
+                    label: 'Total Votes',
+                    data: topVotedCounts,
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Vote Ratio (%)',
+                    data: topVotedRatios,
+                    type: 'line',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Total Votes'
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vote Ratio (%)'
+                        }
+                    }
+                }
+            }
+        });
+        // Data for Events Over Time
+        const eventsOverTime = {{ events_over_time|safe }};
+        const eventLabels = eventsOverTime.map(e => e.event_date); // Use event_date instead of date
+        const eventCounts = eventsOverTime.map(e => e.count);
+
+        const eventsCtx = document.getElementById('eventsOverTimeChart').getContext('2d');
+        new Chart(eventsCtx, {
+            type: 'line',
+            data: {
+                labels: eventLabels,
+                datasets: [{
+                    label: 'New Events',
+                    data: eventCounts,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+      // Data for Most Used Categories
+      const mostUsedCategories = {{ most_used_categories|safe }};
+      const categoryLabels = mostUsedCategories.map(c => c.name);
+      const categoryCounts = mostUsedCategories.map(c => c.event_count);
+
+      const categoriesCtx = document.getElementById('mostUsedCategoriesChart').getContext('2d');
+      new Chart(categoriesCtx, {
+          type: 'bar',
+          data: {
+              labels: categoryLabels,
+              datasets: [{
+                  label: 'Number of Events',
+                  data: categoryCounts,
+                  backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                  borderColor: 'rgba(255, 206, 86, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+
+              // Data for Top 5 Most Messages in a Room
+        const topRooms = {{ top_rooms|safe }};
+        const roomLabels = topRooms.map(r => r.room__name);
+        const messageCounts = topRooms.map(r => r.message_count);
+
+        const topMessagesCtx = document.getElementById('topMessagesChart').getContext('2d');
+        new Chart(topMessagesCtx, {
+            type: 'bar',
+            data: {
+                labels: roomLabels,
+                datasets: [{
+                    label: 'Number of Messages',
+                    data: messageCounts,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Data for Rooms Over Time
+        const roomsOverTime = {{ rooms_over_time|safe }};
+        const roomDateLabels = roomsOverTime.map(r => r.room_date);
+        const roomCounts = roomsOverTime.map(r => r.count);
+
+        const roomsCtx = document.getElementById('roomsOverTimeChart').getContext('2d');
+        new Chart(roomsCtx, {
+            type: 'line',
+            data: {
+                labels: roomDateLabels,
+                datasets: [{
+                    label: 'New Rooms Created',
+                    data: roomCounts,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
