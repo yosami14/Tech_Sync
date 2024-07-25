@@ -100,7 +100,7 @@ def userProfile(request, pk):
 
 
 #User Account Main Page
-@login_required(login_url='login')
+
 def userAccount(request):
     profile = request.user.profile
     skills = profile.skill_set.all()

@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'group',
     'a_rtchat',
     'event',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -237,3 +238,11 @@ JAZZMIN_SETTINGS = {
 JAZZMIN_UI_TWEAKS = {
     "theme": "simplex",
 }
+
+
+GRAPH_MODELS = {
+  'all_applications': True,
+  'group_models': True,
+}
+
+# py manage.py graph_models --pydot -a -g -o my_project_visualized.png
