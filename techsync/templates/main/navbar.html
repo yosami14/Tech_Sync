@@ -74,7 +74,7 @@
                         <ul class="header__menu">
                                 <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
                                 <li class="header__menuItem"><a  href="{% url 'projects' %}">Projects</a></li>
-                                <li class="header__menuItem"><a  href="{% url 'home-group'%}">Group</a></li>
+                                <li class="header__menuItem"><a  href="{% url 'home-group'%}">Chatroom</a></li>
                                 <li class="header__menuItem"><a href="{% url 'events' %}">Events</a></li>
                                 {% if request.user.is_authenticated %}
                                 {% comment %} <li class="header__menuItem"><a  href="{% url 'inbox' %}">Inbox</a></li>  {% endcomment %}

@@ -72,6 +72,8 @@ class Event(models.Model):
             self.location = 'Online'
             self.venue_name = ''
             self.place = ''
+    class Meta:
+        ordering = ['-created_at']
 
 
 

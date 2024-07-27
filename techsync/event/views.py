@@ -199,7 +199,6 @@ def event_detail(request, pk):
 
 #Organizer Profile
 @login_required(login_url='login')
-@event_organizer_only
 def organizerProfile(request, pk):
     organization = get_object_or_404(EventOrganizer, id=pk)
     events = organization.event_set.all()
