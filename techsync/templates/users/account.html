@@ -41,12 +41,12 @@
                     </a>
                   </li>
                 {% endif %}
-                <li>
-                  <a href="{% url 'download-cv' %}" class="btn btn--sub btn--sm">
-                    
-                      <i class="fas fa-download"></i> CV
+                <li style="color:black;">
+                  <a title="Download CV" href="{% url 'download-cv' %}" target="_blank" class="personal">
+                    <i class="fas fa-download" style="color: black;"></i>
                   </a>
                 </li>
+
               
               </ul>
               {% if profile.user != user %}
