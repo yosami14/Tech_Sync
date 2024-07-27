@@ -78,6 +78,7 @@ def editAccount(request):
 
 #User Account Main Page
 @login_required(login_url='login')
+@event_organizer_only
 def userAccount(request):
     organization = request.user.eventorganizer
     events = organization.event_set.all()
@@ -91,6 +92,7 @@ def userAccount(request):
 
 #Add Event
 @login_required(login_url='login')
+@event_organizer_only
 def addEvent(request):
     organizer = request.user.eventorganizer
     form = EventForm()
@@ -132,6 +134,7 @@ def get_event_categories(request):
 
 #UPDATE Event
 @login_required(login_url='login')
+@event_organizer_only
 def updateEvent(request, pk):
     organizer = request.user.eventorganizer
     event = organizer.event_set.get(id=pk)
@@ -154,6 +157,7 @@ def updateEvent(request, pk):
 
 #DELETE PROJECT
 @login_required(login_url="login")
+@event_organizer_only
 def deleteEvent(request, pk):
     organizer = request.user.eventorganizer
     event = organizer.event_set.get(id=pk)
@@ -194,6 +198,8 @@ def event_detail(request, pk):
     return render(request, 'event/event_detail.html', context)
 
 #Organizer Profile
+@login_required(login_url='login')
+@event_organizer_only
 def organizerProfile(request, pk):
     organization = get_object_or_404(EventOrganizer, id=pk)
     events = organization.event_set.all()
@@ -224,7 +230,7 @@ from django.utils import timezone
 from io import BytesIO
 from urllib.parse import urlencode, quote_plus
 
-@login_required
+@login_required(login_url='login')
 def registerForEvent(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if request.method == 'POST':
@@ -358,6 +364,8 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 from .models import Event, EventRegistration
 
+@login_required(login_url="login")
+@event_organizer_only
 def event_analytics(request, pk):
     event = get_object_or_404(Event, pk=pk)
     registrations = EventRegistration.objects.filter(event=event)

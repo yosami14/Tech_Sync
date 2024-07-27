@@ -25,6 +25,10 @@ urlpatterns = [
     path('inbox-message/<str:pk>', views.viewInbox, name='inbox-message'),
     path('send-inbox/<str:pk>', views.createInbox, name='create-inbox'),
 
+    #Download CV
     path('download-cv/', views.download_cv, name='download-cv'),
-   
+    
+    #403 page
+    path('error403/', views.error403, name='error403'),
+    
 ]

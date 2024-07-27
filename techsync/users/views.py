@@ -17,6 +17,10 @@ from .decorators import redirect_based_on_role
 
 
 def loginUser(request):
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in.')
+        return redirect_based_on_role(request.user)
+    
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -236,6 +240,18 @@ def deleteSkill(request, pk):
 
     context = {'object': skill}
     return render(request, 'main/delete_template.html', context)
+
+
+def error403(request):
+    return render(request, 'users/403.html')
+
+
+
+
+
+
+
+
 
 
 @login_required(login_url='login')
