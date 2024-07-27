@@ -84,7 +84,7 @@ def registerUser(request):
 def Profiles(request):
     search_query = request.GET.get('search_query', '')
     profiles = get_search_profile(search_query)
-    custom_range, profiles = paginateProfiles(request, profiles, 3)
+    custom_range, profiles = paginateProfiles(request, profiles, 6)
     context = {
         'profiles': profiles,
         'search_query': search_query,
