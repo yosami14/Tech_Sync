@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .utils import  paginateEvents, get_event_search_results
-
+from users.decorators import event_organizer_only
 
 # Create your views here.
 
@@ -302,6 +302,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import EventRegistration
 
+@event_organizer_only
 def scanQrCode(request):
     context = {}
     scanned_data = None

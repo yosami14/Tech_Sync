@@ -11,8 +11,10 @@ from django.http import JsonResponse
 
 from django.db.models import Q
 from .utils import get_search_profile,paginateProfiles
+from .decorators import redirect_based_on_role
 
 #Authentication
+
 
 def loginUser(request):
     if request.method == "POST":
@@ -25,7 +27,7 @@ def loginUser(request):
             if user is not None and user.is_active:
                 login(request, user)
                 messages.success(request, 'You have been successfully logged in.')
-                return redirect('profiles')  # Adjust the redirect URL as needed
+                return redirect_based_on_role(user)
             else:
                 messages.error(request, 'Invalid email or password.')
         else:
@@ -100,7 +102,7 @@ def userProfile(request, pk):
 
 
 #User Account Main Page
-
+@login_required(login_url='login')
 def userAccount(request):
     profile = request.user.profile
     skills = profile.skill_set.all()

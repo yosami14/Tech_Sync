@@ -7,7 +7,11 @@ from django.db.models import Count, Q, F
 from django.db.models.functions import TruncDate
 from django.utils.dateparse import parse_date
 from datetime import datetime
+from users.decorators import admin_only
+from django.contrib.auth.decorators import login_required
 
+@admin_only
+@login_required(login_url='login')
 def admin_dashboard(request):
     # Get date filters from request
     start_date = request.GET.get('start_date')
