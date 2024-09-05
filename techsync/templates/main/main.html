@@ -111,14 +111,14 @@
             cursor: pointer;
             z-index: 1000;
         }
-
+    
         /* Chat Widget */
         #chat-widget {
             position: fixed;
-            bottom: 80px;
+            bottom: 80px; /* Adjusted to ensure it does not cover the chat icon */
             right: 20px;
-            width: 300px;
-            height: 400px;
+            width: 350px; /* Increased width */
+            height: 500px; /* Increased height */
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 10px;
@@ -129,7 +129,7 @@
             display: flex;
             flex-direction: column;
         }
-
+    
         #chat-header {
             background-color: #007bff;
             color: white;
@@ -139,21 +139,43 @@
             text-align: center;
             flex: 0 0 50px; /* Fixed height for the header */
         }
-
+    
         #chat-body {
             flex: 1;
             padding: 10px;
             overflow-y: auto;
             border-bottom: 1px solid #ddd;
             display: flex;
-            flex-direction: column-reverse; /* Ensure the newest messages appear at the bottom */
+            flex-direction: column; /* Ensure the newest messages appear at the bottom */
         }
-
+    
+        /* Ensure that messages from the user and Coda are aligned differently */
+        .user-message {
+            align-self: flex-end; /* User messages aligned to the right */
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            max-width: 80%; /* Limit message width */
+        }
+    
+        .bot-message {
+            align-self: flex-start; /* Bot messages aligned to the left */
+            background-color: #f1f1f1;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            max-width: 80%; /* Limit message width */
+        }
+    
         #chat-input-container {
             display: flex;
             border-top: 1px solid #ddd;
+            background-color: #f9f9f9; /* Light background for input area */
         }
-
+    
         #chat-input {
             flex: 1;
             padding: 10px;
@@ -161,80 +183,134 @@
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
             resize: none; /* Prevent resizing */
+            border: none; /* Remove border for better look */
         }
-
+    
         #chat-submit {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: none; /* Remove border */
             border-bottom-right-radius: 10px;
             background-color: #007bff;
             color: white;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        /* Scroll to the bottom on new message */
+        #chat-body {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .loading-indicator {
+            color: #007bff;
+            font-style: italic;
+            margin: 10px 0;
         }
     </style>
+    
+    
+    
+    
     <!-- Include jQuery library -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Function to get CSRF token from cookies
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
+<!-- Include jQuery and marked libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
                     }
                 }
-                return cookieValue;
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Display initial introduction message
+        $('#chat-body').append('<div class="bot-message">Hey there! 👋 Welcome to Techsync, Ethiopia\'s developer community. I\'m Coda, your friendly virtual assistant. How can I help you today? 😊</div>');
+
+        // Toggle chat widget visibility
+        $('#chat-icon').on('click', function() {
+            $('#chat-widget').toggle(); // Toggle chat widget visibility
+        });
+
+        // Handle chat submission
+        $('#chat-submit').on('click', function() {
+            var message = $('#chat-input').val().trim();
+            if (message === '') {
+                return; // Prevent sending empty messages
             }
 
-            const csrftoken = getCookie('csrftoken');
+            // Append user message and loading indicator
+            $('#chat-body').append('<div class="user-message">' + message + '</div>');
+            
+            // Clear input field immediately after sending the message
+            $('#chat-input').val('');
+            
+            var loadingIndicator = $('<div class="loading-indicator">Coda is typing...</div>');
+            $('#chat-body').append(loadingIndicator);
 
-            // Display initial introduction message
-            $('#chat-body').append('<div class="bot-message">Hey there! 👋 Welcome to Techsync, Ethiopia\'s developer community. I\'m Coda, your friendly virtual assistant. How can I help you today? 😊</div>');
-
-            // Toggle chat widget visibility
-            $('#chat-icon').on('click', function() {
-                $('#chat-widget').toggle();
-            });
-
-            // Handle chat submission
-            $('#chat-submit').on('click', function() {
-                var message = $('#chat-input').val().trim();
-                if (message === '') {
-                    return; // Prevent sending empty messages
-                }
-
-                $.ajax({
-                    url: '/chatbot/chat/', // Update with your chat endpoint URL
-                    type: 'POST',
-                    data: { message: message },
-                    headers: { 'X-CSRFToken': csrftoken },
-                    success: function(data) {
-                        $('#chat-body').append('<div class="user-message">' + message + '</div>');
-                        $('#chat-body').append('<div class="bot-message">' + data.response + '</div>');
-                        $('#chat-input').val('');
-                        $('#chat-body').scrollTop($('#chat-body')[0].scrollHeight); // Scroll to bottom
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error('Error:', textStatus, errorThrown);
-                        $('#chat-body').append('<div class="bot-message">Sorry, there was an error: ' + textStatus + ' - ' + errorThrown + '.</div>');
-                    }
-                });
-            });
-
-            // Handle Enter key press
-            $('#chat-input').on('keypress', function(e) {
-                if (e.which === 13) { // Enter key
-                    $('#chat-submit').click();
+            $.ajax({
+                url: '/chatbot/chat/', // Update with your chat endpoint URL
+                type: 'POST',
+                data: { message: message },
+                headers: { 'X-CSRFToken': csrftoken },
+                success: function(data) {
+                    loadingIndicator.remove(); // Remove loading indicator on success
+                    // Convert Markdown to HTML and append
+                    $('#chat-body').append('<div class="bot-message">' + marked.parse(data.response) + '</div>');
+                    $('#chat-body').scrollTop($('#chat-body')[0].scrollHeight); // Scroll to bottom
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    loadingIndicator.remove(); // Remove loading indicator on error
+                    console.error('Error:', textStatus, errorThrown);
+                    $('#chat-body').append('<div class="bot-message">Sorry, there was an error: ' + textStatus + ' - ' + errorThrown + '.</div>');
                 }
             });
         });
-    </script>
+
+        // Handle Enter key press
+        $('#chat-input').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                $('#chat-submit').click();
+            }
+        });
+
+        // Minimize chat widget initially
+        $('#chat-widget').hide(); // Start with widget minimized
+
+        // Ensure the chat icon is always at the bottom-right corner
+        $(window).on('resize scroll', function() {
+            $('#chat-icon').css({
+                'bottom': '20px',
+                'right': '20px'
+            });
+        });
+
+        // Ensure chat widget does not cover the chat icon when expanded
+        $('#chat-widget').on('click', function() {
+            $(this).css('bottom', '80px'); // Adjust bottom position when expanded
+        });
+    });
+</script>
+
+
+
+
+
 
     
 
