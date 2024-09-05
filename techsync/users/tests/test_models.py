@@ -2,6 +2,9 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from users.models import Profile
 
+# run test 
+# python manage.py test users.tests.test_models
+
 class UserModelTest(TestCase):
     def test_create_user(self):
         User = get_user_model()

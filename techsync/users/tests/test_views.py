@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from users.views import loginUser, logoutUser, registerUser, userProfile, userAccount, download_cv
 from users.utils import get_search_profile
+# run test 
+# python manage.py test users.tests.test_views
 class TestViews(TestCase):
 
     def setUp(self):

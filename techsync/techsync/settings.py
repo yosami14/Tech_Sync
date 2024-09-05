@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'group',
     'a_rtchat',
     'event',
+    'features',
     'django_extensions',
 ]
 
@@ -246,3 +247,15 @@ GRAPH_MODELS = {
 }
 
 # py manage.py graph_models --pydot -a -g -o my_project_visualized.png
+
+
+# chatbot
+# settings.py
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, 'techsync/features/.env'))
+
+# Other settings...

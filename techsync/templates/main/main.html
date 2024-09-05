@@ -75,8 +75,170 @@
       {% endblock %}
     {% endblock content %}
 
-</body>
+     <!-- Floating Chat Icon -->
+     <div id="chat-icon">
+      <span>💬</span>
+  </div>
 
+  <!-- Chat Widget -->
+  <div id="chat-widget">
+      <div id="chat-header">Chat with Coda</div>
+      <div id="chat-body"></div>
+      <div id="chat-input-container">
+          <textarea id="chat-input" placeholder="Type your message..."></textarea>
+          <button id="chat-submit">Send</button>
+      </div>
+  </div>
+
+</body>
+{% comment %} coda {% endcomment %}
+    <!-- Other head elements -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <style>
+        /* Floating Chat Icon */
+        #chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* Chat Widget */
+        #chat-widget {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+            flex: 0 0 50px; /* Fixed height for the header */
+        }
+
+        #chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            flex-direction: column-reverse; /* Ensure the newest messages appear at the bottom */
+        }
+
+        #chat-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            resize: none; /* Prevent resizing */
+        }
+
+        #chat-submit {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-bottom-right-radius: 10px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+
+            // Display initial introduction message
+            $('#chat-body').append('<div class="bot-message">Hey there! 👋 Welcome to Techsync, Ethiopia\'s developer community. I\'m Coda, your friendly virtual assistant. How can I help you today? 😊</div>');
+
+            // Toggle chat widget visibility
+            $('#chat-icon').on('click', function() {
+                $('#chat-widget').toggle();
+            });
+
+            // Handle chat submission
+            $('#chat-submit').on('click', function() {
+                var message = $('#chat-input').val().trim();
+                if (message === '') {
+                    return; // Prevent sending empty messages
+                }
+
+                $.ajax({
+                    url: '/chatbot/chat/', // Update with your chat endpoint URL
+                    type: 'POST',
+                    data: { message: message },
+                    headers: { 'X-CSRFToken': csrftoken },
+                    success: function(data) {
+                        $('#chat-body').append('<div class="user-message">' + message + '</div>');
+                        $('#chat-body').append('<div class="bot-message">' + data.response + '</div>');
+                        $('#chat-input').val('');
+                        $('#chat-body').scrollTop($('#chat-body')[0].scrollHeight); // Scroll to bottom
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('Error:', textStatus, errorThrown);
+                        $('#chat-body').append('<div class="bot-message">Sorry, there was an error: ' + textStatus + ' - ' + errorThrown + '.</div>');
+                    }
+                });
+            });
+
+            // Handle Enter key press
+            $('#chat-input').on('keypress', function(e) {
+                if (e.which === 13) { // Enter key
+                    $('#chat-submit').click();
+                }
+            });
+        });
+    </script>
+
+    
+
+{% comment %} coda {% endcomment %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {

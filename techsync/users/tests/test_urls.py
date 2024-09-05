@@ -2,6 +2,9 @@ from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 from users import views 
 
+# run test 
+# python manage.py test users.tests.test_urls
+
 class TestUrls(SimpleTestCase):
 
     def test_login_url_is_resolved(self):

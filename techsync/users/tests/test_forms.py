@@ -4,6 +4,8 @@ from users.models import Skill
 from django.contrib.auth import get_user_model
 from users.forms import UserForm, ProfileForm
 
+# run test 
+# python manage.py test users.tests.test_forms
 
 class UserFormTest(TestCase):
     def test_user_form(self):
