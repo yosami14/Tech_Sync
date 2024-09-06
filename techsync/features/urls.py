@@ -5,4 +5,6 @@ from . import views
 urlpatterns = [
     # Other URL patterns...
     path('chat/', views.chatbot_view, name='chat_view'),
+    path('telegram-to-gemini/', views.telegram_to_gemini, name='telegram_to_gemini'),
+
 ]
