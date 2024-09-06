@@ -123,3 +123,25 @@ async def schedule_tasks():
 
 if __name__ == '__main__':
     asyncio.run(schedule_tasks())
+
+
+# telegram_bot.py
+from telegram import Bot
+from telegram.constants import ParseMode
+from telegram.error import TelegramError
+from asgiref.sync import sync_to_async
+
+
+async def send_message_to_channel(message, photo_url=None):
+    try:
+        if photo_url:
+            await bot.send_photo(chat_id=CHANNEL_ID, photo=photo_url, caption=message, parse_mode=ParseMode.HTML)
+        else:
+            await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode=ParseMode.HTML)
+        print("Message sent successfully!")
+    except TelegramError as e:
+        print(f"Failed to send message: {e}")
+
+def send_message_to_channel_sync(message, photo_url=None):
+    # Wrap the async function with sync_to_async
+    return sync_to_async(send_message_to_channel)(message, photo_url)

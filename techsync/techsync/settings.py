@@ -259,6 +259,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, 'techsync/features/.env'))
 load_dotenv(os.path.join(BASE_DIR, 'techsync/bot/.env'))
+load_dotenv(os.path.join(BASE_DIR, 'techsync/event/.env'))
+
 
 # Other settings...
 # For development
