@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'ckeditor',
     #if u Encounter a error for signals or app 
     #'users.apps.UsersConfig',
+    'techsync',
     'projects',
     'users',
     'group',
@@ -251,11 +252,14 @@ GRAPH_MODELS = {
 
 # chatbot
 # settings.py
-import os
-from pathlib import Path
 from dotenv import load_dotenv
+from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, 'techsync/features/.env'))
+load_dotenv(os.path.join(BASE_DIR, 'techsync/bot/.env'))
 
 # Other settings...
+# For development
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'techsync.settings')
