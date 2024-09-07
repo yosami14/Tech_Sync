@@ -25,7 +25,14 @@ def escape_markdown_v2(text):
     return re.sub(r'([_*\[\]()~`>#+-=|{}.!])', r'\\\1', text)
 
 async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text("Hello! I'm your Telegram bot. How can I assist you today?")
+    start_message = (
+        "Welcome to Techsync Bot! 🤖\n\n"
+        "I'm here to help you with information about Techsync projects and events.\n\n"
+        "To get started, just type your message and I'll assist you with any questions or information you need.\n"
+        "Feel free to ask me about project details, event announcements, or anything else related to Techsync."
+    )
+    await update.message.reply_text(start_message)
+
 
 async def handle_message(update: Update, context: CallbackContext):
     if update.message:
