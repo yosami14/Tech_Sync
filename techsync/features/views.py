@@ -108,7 +108,6 @@ def telegram_to_gemini(request):
 
 
 
-# register 
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
@@ -120,16 +119,36 @@ def register_via_telegram(request):
     if request.method == 'POST':
         # Parse JSON data from request
         data = json.loads(request.body)
+        username = data.get('username')
+        email = data.get('email')
+        password1 = data.get('password1')
+        password2 = data.get('password2')
+        
+        # Check if username or email already exists
+        User = get_user_model()
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'status': 'error', 'errors': {'username': 'Username is already in use.'}}, status=400)
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'status': 'error', 'errors': {'email': 'Email is already in use.'}}, status=400)
+        
+        # Validate password confirmation
+        if password1 != password2:
+            return JsonResponse({'status': 'error', 'errors': {'password': 'Passwords do not match.'}}, status=400)
+        
+        # Use the UserForm for additional validation
         form = UserForm(data)
-
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
+            user.set_password(password1)  # Ensure the password is hashed
             user.save()
             return JsonResponse({'status': 'success', 'message': 'User registered successfully!'}, status=201)
         else:
             errors = form.errors.as_json()
             return JsonResponse({'status': 'error', 'errors': errors}, status=400)
+    
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
 
 

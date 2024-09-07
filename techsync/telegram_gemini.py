@@ -1,18 +1,12 @@
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, ConversationHandler, CallbackContext, filters
 import os
 import re
 import requests
 import logging
-from telegram import Update, Bot
-from telegram.constants import ParseMode
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    MessageHandler,
-    ConversationHandler,
-    CallbackContext,
-    filters,
-)
 from dotenv import load_dotenv
+from telegram import Bot
+from telegram.constants import ParseMode
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,13 +22,11 @@ DJANGO_REGISTER_URL = 'http://127.0.0.1:8000/chatbot/register/'  # Update with y
 bot = Bot(token=TELEGRAM_API_KEY)
 
 # States for the registration flow
-FIRST_NAME, USERNAME, EMAIL, PASSWORD = range(4)
-
+FIRST_NAME, USERNAME, EMAIL, PASSWORD, CONFIRM_PASSWORD = range(5)
 
 def escape_markdown_v2(text):
     """Escapes characters for Markdown V2."""
     return re.sub(r'([_*\[\]()~`>#+-=|{}.!])', r'\\\1', text)
-
 
 async def start(update: Update, context: CallbackContext):
     start_message = (
@@ -43,7 +35,6 @@ async def start(update: Update, context: CallbackContext):
         "Type /register to create a new account or just type a message to chat with me."
     )
     await update.message.reply_text(start_message)
-
 
 async def handle_message(update: Update, context: CallbackContext):
     if update.message:
@@ -74,40 +65,65 @@ async def handle_message(update: Update, context: CallbackContext):
     else:
         logger.warning("Received an update without a message.")
 
-
 async def register(update: Update, context: CallbackContext):
     await update.message.reply_text("Please provide your first name:")
     return FIRST_NAME
-
 
 async def first_name(update: Update, context: CallbackContext):
     context.user_data['first_name'] = update.message.text
     await update.message.reply_text("Please provide your username:")
     return USERNAME
 
-
 async def username(update: Update, context: CallbackContext):
+    context.user_data.setdefault('attempts', {'username': 0, 'email': 0})
+
     context.user_data['username'] = update.message.text
+    response = requests.post(DJANGO_REGISTER_URL, json={'username': context.user_data['username']})
+    if response.status_code == 400:
+        errors = response.json().get('errors', {})
+        if 'username' in errors:
+            context.user_data['attempts']['username'] += 1
+            if context.user_data['attempts']['username'] >= 3:
+                await update.message.reply_text("You have exceeded the maximum number of attempts. Please try again later.")
+                return ConversationHandler.END
+            await update.message.reply_text(f"Username is already in use. Attempt {context.user_data['attempts']['username']} of 3. Please provide a different username:")
+            return USERNAME
     await update.message.reply_text("Please provide your email:")
     return EMAIL
 
-
 async def email(update: Update, context: CallbackContext):
     context.user_data['email'] = update.message.text
+    response = requests.post(DJANGO_REGISTER_URL, json={'email': context.user_data['email']})
+    if response.status_code == 400:
+        errors = response.json().get('errors', {})
+        if 'email' in errors:
+            context.user_data['attempts']['email'] += 1
+            if context.user_data['attempts']['email'] >= 3:
+                await update.message.reply_text("You have exceeded the maximum number of attempts. Please try again later.")
+                return ConversationHandler.END
+            await update.message.reply_text(f"Email is already in use. Attempt {context.user_data['attempts']['email']} of 3. Please provide a different email:")
+            return EMAIL
     await update.message.reply_text("Please provide your password:")
     return PASSWORD
 
-
 async def password(update: Update, context: CallbackContext):
-    context.user_data['password'] = update.message.text
+    context.user_data['password1'] = update.message.text
+    await update.message.reply_text("Please confirm your password:")
+    return CONFIRM_PASSWORD
+
+async def confirm_password(update: Update, context: CallbackContext):
+    password2 = update.message.text
+    if context.user_data['password1'] != password2:
+        await update.message.reply_text("Passwords do not match. Please enter your password again:")
+        return PASSWORD
 
     # Send registration data to Django API
     user_data = {
         'first_name': context.user_data['first_name'],
         'username': context.user_data['username'],
         'email': context.user_data['email'],
-        'password1': context.user_data['password'],
-        'password2': context.user_data['password'],
+        'password1': context.user_data['password1'],
+        'password2': context.user_data['password1'],  # The password2 should be the same as password1 for confirmation
     }
 
     response = requests.post(DJANGO_REGISTER_URL, json=user_data)
@@ -118,7 +134,6 @@ async def password(update: Update, context: CallbackContext):
         await update.message.reply_text(f"Registration failed: {errors}")
 
     return ConversationHandler.END
-
 
 def main():
     application = Application.builder().token(TELEGRAM_API_KEY).build()
@@ -131,6 +146,7 @@ def main():
             USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, username)],
             EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, email)],
             PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, password)],
+            CONFIRM_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, confirm_password)],
         },
         fallbacks=[],
     )
@@ -140,7 +156,6 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     application.run_polling()
-
 
 if __name__ == '__main__':
     main()
