@@ -1,18 +1,19 @@
 import os
+import asyncio
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from telegram import Bot
 from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from .models import Event
-import asyncio
+from django.conf import settings  # Use Django settings for API keys
 
 CHANNEL_ID = -1002445584860
 TELEGRAM_API_KEY = '7073386598:AAGsPT4QHgarUbux-BjzmjotjBMo3TeeoPg'
-
-# Initialize the Telegram Bot
+BOT_USERNAME = 'techsyncs_bot'  
 bot = Bot(token=TELEGRAM_API_KEY)
-print("Telegram API Key:", TELEGRAM_API_KEY)
+
+MAX_CAPTION_LENGTH = 1024  # Telegram's maximum length for a message caption
 
 @receiver(post_save, sender=Event)
 def event_post_save(sender, instance, **kwargs):
@@ -21,56 +22,54 @@ def event_post_save(sender, instance, **kwargs):
     """
     created = kwargs.get('created', False)
     
-    if created or not created:  # This covers both creation and updates
-        print(f"Signal triggered for event ID: {instance.id}")
-        event = instance
+    # Handle both creation and updates
+    event = instance
 
-        # Compose the message
-        message = (
-            "<b>{}</b>\n\n"
-            "Date: {}\n\n"
-            "Description: {}\n\n"
-            "{}{}"
-            "<a href='http://127.0.0.1:8000/events/{}/'>View More</a>"
-        ).format(
-            event.title,
-            event.date,
-            event.description.replace('<p>', '').replace('</p>', ''),  # Remove unsupported <p> tags
-            'Location: {}\n'.format(event.location) if event.location else '',
-            'Venue: {}\n'.format(event.venue_name) if event.venue_name else '',
-            event.id
-        )
+    # Create a shorter message with a truncated description and clear links
+    description = event.description.replace('<p>', '').replace('</p>', '')  # Remove unsupported <p> tags
+    if len(description) > 200:  # Limit description to 200 characters
+        description = description[:197] + '...'  # Truncate and add ellipsis
 
-        # Check if there is an image to include in the post
-        if event.event_image:
-            # Get the full path to the image file
-            image_path = event.event_image.path
-            print(f"Image path: {image_path}")
+    message = (
+        "<b>{}</b>\n"
+        "Date: {}\n\n"
+        "{}\n\n"
+        "<a href='http://127.0.0.1:8000/event/event_detail/{}/'>View More</a>\n"
+        "<a href='tg://resolve?domain={}&start=register_event_{}'>Register</a>"
+    ).format(
+        event.title,
+        event.date,
+        description,  # Shortened description
+        event.id,  # For "View More" link
+        BOT_USERNAME,  # For "Register" deep link
+        event.id  # Pass event ID to the bot
+    )
 
-            async def send_message():
-                try:
-                    if os.path.exists(image_path):
-                        with open(image_path, 'rb') as photo_file:
-                            await bot.send_photo(chat_id=CHANNEL_ID, photo=photo_file, caption=message, parse_mode=ParseMode.HTML)
-                            print("Image sent successfully!")
-                    else:
-                        print(f"Image file not found: {image_path}")
-                        await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode=ParseMode.HTML)
-                except TelegramError as e:
-                    print(f"Failed to send message: {e}")
+    # Ensure message is within Telegram's caption length limit
+    if len(message) > MAX_CAPTION_LENGTH:
+        message = message[:MAX_CAPTION_LENGTH - 3] + '...'  # Truncate and add ellipsis
 
-            # Run the async function
-            asyncio.run(send_message())
-        else:
-            # No image to include in the post
-            async def send_message_without_image():
-                try:
+    async def send_message():
+        try:
+            if event.event_image:
+                # Get the full path to the image file
+                image_path = event.event_image.path
+                if os.path.exists(image_path):
+                    with open(image_path, 'rb') as photo_file:
+                        await bot.send_photo(chat_id=CHANNEL_ID, photo=photo_file, caption=message, parse_mode=ParseMode.HTML)
+                        print("Image sent successfully!")
+                else:
+                    print(f"Image file not found: {image_path}")
                     await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode=ParseMode.HTML)
-                    print("Message sent successfully without image!")
-                except TelegramError as e:
-                    print(f"Failed to send message: {e}")
+            else:
+                # No image to include in the post
+                await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode=ParseMode.HTML)
+                print("Message sent successfully without image!")
+        except TelegramError as e:
+            print(f"Failed to send message: {e}")
 
-            # Run the async function
-            asyncio.run(send_message_without_image())
-    else:
-        print("Signal not triggered: neither created nor update_fields")
+    # Run the async function in a new event loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(send_message())
+    loop.close()

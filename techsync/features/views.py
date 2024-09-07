@@ -106,3 +106,30 @@ def telegram_to_gemini(request):
 
 
 
+
+
+# register 
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import csrf_exempt
+from users.forms import UserForm
+import json
+
+@csrf_exempt
+def register_via_telegram(request):
+    if request.method == 'POST':
+        # Parse JSON data from request
+        data = json.loads(request.body)
+        form = UserForm(data)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            return JsonResponse({'status': 'success', 'message': 'User registered successfully!'}, status=201)
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 'error', 'errors': errors}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
