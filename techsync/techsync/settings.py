@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'a_rtchat',
     'event',
     'features',
+    'a_videoChat',
     'django_extensions',
 ]
 

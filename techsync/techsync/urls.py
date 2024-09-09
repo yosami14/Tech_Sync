@@ -30,6 +30,7 @@ urlpatterns = [
     path('chatroom/',include('a_rtchat.urls')),
     path('event/',include('event.urls')),
     path('chatbot/',include('features.urls')),
+    path('conference/',include('a_videoChat.urls')),
     path('',include('users.urls')),
 
     path('admin-charts/', views.admin_dashboard, name='admin-charts'),

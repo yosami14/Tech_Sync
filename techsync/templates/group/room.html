@@ -53,7 +53,12 @@
               <i class="fas fa-cog"></i>
             </svg>
           </a>
-
+          <a  href="{% url 'meeting' %}?next={% url 'room' room.id %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>Meeting</title>
+              <i class="fas fa-video"></i>
+            </svg>
+          </a>
           {% endif %}
           {% if request.user != room.host %}
           <a  href="{% url 'leave-group' room.id %}?next={% url 'home-group' %}">
@@ -62,6 +67,14 @@
               <i class="fas fa-sign-out-alt"></i>
             </svg>
           </a>
+          <a  href="{% url 'join-room' %}?next={% url 'room' room.id %}">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+              <title>Join Meeting</title>
+              <i class="fas fa-video"></i>
+            </svg>
+          </a>
+
+
           {% endif %}
         </div>
 
