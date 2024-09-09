@@ -228,6 +228,10 @@ from django.core.mail import EmailMessage
 from django.utils import timezone
 from io import BytesIO
 from urllib.parse import urlencode, quote_plus
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.conf import settings
+from .models import Event, EventRegistration
 
 @login_required(login_url='login')
 def registerForEvent(request, pk):
@@ -257,13 +261,18 @@ def registerForEvent(request, pk):
             qr_image.save(qr_buffer, format='PNG')
             qr_image_file = ContentFile(qr_buffer.getvalue(), 'event_qr_code.png')
 
+            # Generate Jitsi Meet link for online events
+            meet_link = ""
+            if event.location_type == 'ONLINE':
+                meet_link = generate_jitsi_meet_link()  # Custom function to create a Jitsi Meet link
+
             # Google Calendar link
             if google_calendar:
                 event_details = {
                     'action': 'TEMPLATE',
                     'text': event.title,
                     'dates': f'{event.date.strftime("%Y%m%dT%H%M%S")}/{event.end_date.strftime("%Y%m%dT%H%M%S")}',
-                    'location': f'https://www.google.com/maps/search/?api=1&query={quote_plus(event.venue_name)}',
+                    'location': meet_link if meet_link else f'https://www.google.com/maps/search/?api=1&query={quote_plus(event.venue_name)}',
                     'details': request.build_absolute_uri(reverse('event-detail', args=[event.pk])),
                 }
                 google_calendar_url = f'https://www.google.com/calendar/render?{urlencode(event_details)}'
@@ -281,6 +290,7 @@ def registerForEvent(request, pk):
             Date: {event.date.strftime("%Y-%m-%d")}
             Time: {event.date.strftime("%H:%M")}
             Venue: {event.venue_name}
+            Meet Link: {meet_link}
 
             {calendar_message}
             Here is your QR code for event entry:
@@ -299,6 +309,11 @@ def registerForEvent(request, pk):
         return redirect('event-detail', pk=event.pk)
     return redirect('event-detail', pk=event.pk)
 
+def generate_jitsi_meet_link():
+    # This function generates a unique Jitsi Meet link
+    # Customize the room name to ensure uniqueness or add more logic if needed
+    room_name = f"event-{timezone.now().strftime('%Y%m%d%H%M%S')}"
+    return f"https://meet.jit.si/{room_name}"
 
 
 

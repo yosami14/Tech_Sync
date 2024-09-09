@@ -11,8 +11,7 @@
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="form__field" id="field_{{ field.name }}">
-                            <label for="formInput#text">{{ field.label }}</label>
-                            {{ form.media }}
+                            <label for="id_{{ field.name }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.name == 'location' %}
                                 <div id="location-suggestions" class="autocomplete-suggestions"></div>
@@ -37,14 +36,14 @@
         const locationInput = document.querySelector('input[name="location"]');
         const suggestionsContainer = document.getElementById('location-suggestions');
         const venueNameInput = document.querySelector('input[name="venue_name"]');
-        const attendeesLimitInput = document.querySelector('input[name="attendees_limit"]');  // Add this line
+        const attendeesLimitInput = document.querySelector('input[name="attendees_limit"]');
         let map;
 
         const locationTypeField = document.querySelector('select[name="location_type"]');
         const locationField = document.getElementById('field_location');
         const venueNameField = document.getElementById('field_venue_name');
         const placeField = document.getElementById('field_place');
-        const attendeesLimitField = document.getElementById('field_attendees_limit');  // Add this line
+        const attendeesLimitField = document.getElementById('field_attendees_limit');
         const mapDiv = document.getElementById('map');
 
         function toggleVenueDetails() {
@@ -52,14 +51,14 @@
                 locationField.style.display = 'block';
                 venueNameField.style.display = 'block';
                 placeField.style.display = 'block';
-                attendeesLimitField.style.display = 'block';  // Add this line
+                attendeesLimitField.style.display = 'block';
                 mapDiv.style.display = 'block';
                 initMap();  // Initialize map if venue type is selected
             } else {
                 locationField.style.display = 'none';
                 venueNameField.style.display = 'none';
                 placeField.style.display = 'none';
-                attendeesLimitField.style.display = 'none';  // Add this line
+                attendeesLimitField.style.display = 'none';
                 mapDiv.style.display = 'none';
             }
         }
@@ -86,7 +85,7 @@
             geocoder.geocode(query, function(results) {
                 suggestionsContainer.innerHTML = '';  // Clear previous suggestions
 
-                results.forEach(function(result, index) {
+                results.forEach(function(result) {
                     const suggestion = document.createElement('div');
                     suggestion.classList.add('autocomplete-item');
                     suggestion.textContent = result.name;
@@ -123,6 +122,11 @@
             } else {
                 clearSuggestions();
             }
+        });
+
+        // Optionally, clear suggestions when input field loses focus
+        locationInput.addEventListener('blur', function() {
+            setTimeout(clearSuggestions, 200);  // Timeout to ensure click event is processed
         });
 
         toggleVenueDetails();  // Call to set initial display

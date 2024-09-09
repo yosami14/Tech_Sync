@@ -73,3 +73,33 @@ def event_post_save(sender, instance, **kwargs):
     asyncio.set_event_loop(loop)
     loop.run_until_complete(send_message())
     loop.close()
+
+# signals.py
+
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Event, EventRegistration
+
+@receiver(pre_delete, sender=Event)
+def notify_attendees_before_event_deletion(sender, instance, **kwargs):
+    # Get all registrations related to the event
+    registrations = EventRegistration.objects.filter(event=instance)
+
+    # Prepare the email content
+    subject = f"Cancellation Notice for Event: {instance.title}"
+    message = f"We regret to inform you that the event '{instance.title}' scheduled for {instance.date} has been canceled."
+
+    # Send email to each attendee
+    for registration in registrations:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,  # Make sure this is set in your settings
+            [registration.attendee.email],  # Recipient list
+            fail_silently=False,  # Raise an error if sending fails
+        )
+
+    # Optionally, log the notification for debugging or auditing purposes
+    print(f"Notification emails sent to attendees for event: {instance.title}")
